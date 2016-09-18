@@ -6,6 +6,7 @@
 * Update: Randomize do not repeat consecutive sprite modes
 * Fix: Falling on top of guards should not kill runner
 * Fix: Sometimes Guards not showing after complete
+* Fix: Sometimes when starting a level any key just kills the runner #7
 
 #####v0.6 - 16-Sep-2016 - Simple Guards AI, Sounds and Credits
 * Add: Simple Guards AI to validate animation
