@@ -1,0 +1,14 @@
+{
+    "sequence":
+    {
+        "runRight":  [0, 2],
+        "runLeft":   [3, 5],
+        "runUpDown": [6, 7],
+        "barRight":  [9, 10, 10, 11, 11],
+        "barLeft":   [12, 13, 13, 14, 14],
+        "digRight":  [15],
+        "digLeft":   [16],
+        "fallRight": [8],
+        "fallLeft":  [17]
+    }
+}
