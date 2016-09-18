@@ -101,7 +101,23 @@ End Sub
 
 Sub ResetGame()
     g = GetGlobalAA()
-    if g.level <> invalid then DestroyStage()
+    print "Reseting Level "; itostr(g.currentLevel)
+    if g.level <> invalid
+        DestroyStage()
+        if g.guards.Count() > 0
+            for each guard in g.guards
+                if guard.sprite <> invalid
+                    guard.sprite.Remove()
+                    guard.sprite = invalid
+                end if
+            next
+            g.guards.Clear()
+        end if
+        if g.runner <> invalid and g.runner.sprite <> invalid
+            g.runner.sprite.Remove()
+            g.runner.sprite = invalid
+        end if
+    end if
     g.level = CreateLevel(GetVersionMap(g.settings.version), g.currentLevel)
     if g.settings.spriteMode < g.const.SPRITES_RND
         LoadGameSprites(g.settings.spriteMode)
@@ -115,19 +131,8 @@ Sub ResetGame()
         g.runner = CreateRunner(g.level)
     else
         g.runner.startLevel(g.level)
-        if g.runner.sprite <> invalid
-            g.runner.sprite.Remove()
-            g.runner.sprite = invalid
-        end if
     end if
-    g.runner.alive = true
     if g.guards = invalid then g.guards = []
-    if g.guards.Count() > 0
-        for each guard in g.guards
-            if guard.sprite <> invalid then guard.sprite.Remove()
-        next
-        g.guards.Clear()
-    end if
     for i = 0 to g.level.guards.Count() - 1
         g.guards.Push(CreateGuard(g.level, g.level.guards[i]))
     next

@@ -183,6 +183,7 @@ Sub RunnerUpdate()
         y = (m.runner.blockY * m.const.TILE_HEIGHT) + m.runner.offsetY
         if m.runner.sprite = invalid
             m.runner.sprite = m.compositor.NewSprite(x, y, rnRegion, m.const.CHARS_Z)
+            m.runner.sprite.SetData("runner")
         else
             m.runner.sprite.SetRegion(rnRegion)
             m.runner.sprite.MoveTo(x, y)
@@ -215,6 +216,7 @@ Sub GuardsUpdate()
             y = (guard.blockY * m.const.TILE_HEIGHT) + guard.offsetY
             if guard.sprite = invalid
                 guard.sprite = m.compositor.NewSprite(x, y, gdRegion, m.const.CHARS_Z)
+                guard.sprite.SetData("guard")
             else
                 guard.sprite.SetRegion(gdRegion)
                 guard.sprite.MoveTo(x, y)
@@ -224,7 +226,6 @@ Sub GuardsUpdate()
 End Sub
 
 Sub DrawLevel()
-    print "draw level"
     'Clear old stage sprites
     DestroyStage()
     'Draw level rooms
@@ -238,6 +239,7 @@ Sub DrawLevel()
                     y = ty * m.const.TILE_HEIGHT
                     tile.sprite = m.compositor.NewSprite(x, y, tileRegion, m.const.TILES_Z)
                     tile.sprite.SetMemberFlags(0)
+                    tile.sprite.SetData(tile.bitmap)
                     if tile.base = m.const.MAP_HLADR
                         tile.sprite.SetDrawableFlag(m.level.gold = 0)
                     end if
@@ -291,6 +293,7 @@ Sub HolesUpdate()
                         yOff = tileRegion.GetHeight() - 22
                         tile.sprite = m.compositor.NewSprite(x, y - yOff, tileRegion, m.const.CHARS_Z + 1)
                         tile.sprite.SetMemberFlags(0)
+                        tile.sprite.SetData(tile.bitmap)
                     end if
                 end if
             end if
@@ -300,12 +303,18 @@ End Sub
 
 Sub DestroyChars()
     if m.runner <> invalid
-        if m.runner.sprite <> invalid then m.runner.sprite.Remove()
+        if m.runner.sprite <> invalid
+            m.runner.sprite.Remove()
+            m.runner.sprite = invalid
+        end if
         m.runner = invalid
     end if
     if m.guards <> invalid and m.guards.Count() > 0
         for each guard in m.guards
-            if guard.sprite <> invalid then guard.sprite.Remove()
+            if guard.sprite <> invalid
+                guard.sprite.Remove()
+                guard.sprite = invalid
+            end if
         next
         m.guards.Clear()
     end if

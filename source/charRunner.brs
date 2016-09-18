@@ -36,6 +36,7 @@ Function CreateRunner(level as object) as object
 End Function
 
 Sub start_level_runner(level as object)
+    m.alive = true
     m.level = level
     m.blockX = level.runner.x
     m.blockY = level.runner.y
