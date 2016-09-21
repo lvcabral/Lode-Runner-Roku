@@ -6,8 +6,6 @@
 ' **  Updated: September 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
-' **  https://github.com/SimonHung/LodeRunner - HTML5 version by Simon Hung
-' **
 ' ********************************************************************************************************
 ' ********************************************************************************************************
 Library "v30/bslDefender.brs"
@@ -28,24 +26,17 @@ Sub Main()
     'm.sounds = LoadSounds(true)
     m.files = CreateObject("roFileSystem")
     m.manifest = GetManifestArray()
-    'Initialize Settings
     m.settings = LoadSettings()
-    if m.settings = invalid
-        m.settings = {}
-        m.settings.controlMode = m.const.CONTROL_VERTICAL
-        m.settings.spriteMode = m.const.SPRITES_AP2
-        m.settings.version = m.const.VERSION_CLASSIC
-        m.settings.rewFF = m.const.REWFF_LEVEL
-    end if
     'Debug switches
-    m.stopGuards = false ' flag to enable/disable guards AI
+    m.stopGuards = false ' flag to enable/disable guards
     m.immortal = false 'flag to enable/disable runner immortality
     'Main Menu Loop
     while true
         'Configure screen/game areas based on the configuration
         SetupGameScreen()
         print "Starting menu..."
-        if StartMenu()
+        selection = StartMenu()
+        if selection = m.const.MENU_START
             print "Starting game..."
             m.currentLevel = 1
             m.levelSprites = invalid
@@ -53,31 +44,26 @@ Sub Main()
             ResetGame()
             PlayIntro(2000)
             PlayGame()
+        else if selection = m.const.MENU_CREDITS
+            ShowCredits()
         end if
     end while
 End Sub
 
 Sub PlayIntro(waitTime as integer)
-	screen = m.mainScreen
-    centerX = Cint((screen.GetWidth() - 640) / 2)
-    centerY = Cint((screen.GetHeight() - 400) / 2)
     if m.settings.spriteMode < m.const.SPRITES_RND
         spriteMode = m.settings.spriteMode
     else
         spriteMode = m.levelSprites[m.currentLevel]
     end if
-    if spriteMode = m.const.SPRITES_AP2
-        imgIntro = "pkg:/assets/images/ap2/start-screen.png"
-    else if spriteMode = m.const.SPRITES_C64
-        imgIntro = "pkg:/assets/images/c64/start-screen.png"
-    else if spriteMode = m.const.SPRITES_IBM
-        imgIntro = "pkg:/assets/images/ibm/start-screen.png"
-    else if spriteMode = m.const.SPRITES_A8B
-        imgIntro = "pkg:/assets/images/a8b/start-screen.png"
-    end if
+    imgIntro = "pkg:/assets/images/" + GetSpriteFolder(spriteMode) + "/start-screen.png"
+    screen = m.mainScreen
+    bmp = CreateObject("roBitmap", imgIntro)
+    centerX = Cint((screen.GetWidth() - bmp.GetWidth()) / 2)
+    centerY = Cint((screen.GetHeight() - bmp.GetHeight()) / 2)
     screen.Clear(0)
     screen.SwapBuffers()
-    screen.DrawObject(centerX, centerY, CreateObject("roBitmap", imgIntro))
+    screen.DrawObject(centerX, centerY, bmp)
     screen.SwapBuffers()
 	while true
     	key = wait(waitTime, m.port)
@@ -136,7 +122,8 @@ Sub ResetGame()
     for i = 0 to g.level.guards.Count() - 1
         g.guards.Push(CreateGuard(g.level, g.level.guards[i]))
     next
-    g.guardFlag = true
+    g.nextGuard = 0
+    g.nextMoves = 0
     g.level.redraw = true
     'StopAudio()
 End Sub
@@ -144,15 +131,7 @@ End Sub
 Sub LoadGameSprites(spriteMode as integer)
     g = GetGlobalAA()
     if g.regions = invalid then g.regions = {spriteMode: spriteMode}
-    if spriteMode = g.const.SPRITES_AP2
-        path = "pkg:/assets/sprites/ap2/"
-    else if spriteMode = g.const.SPRITES_C64
-        path = "pkg:/assets/sprites/c64/"
-    else if spriteMode = g.const.SPRITES_IBM
-        path = "pkg:/assets/sprites/ibm/"
-    else if spriteMode = g.const.SPRITES_A8B
-        path = "pkg:/assets/sprites/a8b/"
-    end if
+    path = "pkg:/assets/sprites/" + GetSpriteFolder(spriteMode) + "/"
     'Load Regions
     if g.regions.tiles = invalid or g.regions.spriteMode <> spriteMode
         g.regions.tiles = LoadBitmapRegions(path, "tiles")
@@ -169,7 +148,7 @@ Function RandomizeLevelSprites(max as integer) as object
     spriteMode = -1
     for i = 1 to max
         while spriteMode = rndArray[i - 1]
-            spriteMode = Rnd(4) - 1
+            spriteMode = Rnd(5) - 1
         end while
         rndArray.Push(spriteMode)
     next

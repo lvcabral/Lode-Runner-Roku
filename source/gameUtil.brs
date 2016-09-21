@@ -6,8 +6,6 @@
 ' **  Updated: September 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
-' **  https://github.com/SimonHung/LodeRunner - HTML5 version by Simon Hung
-' **
 ' ********************************************************************************************************
 ' ********************************************************************************************************
 
@@ -18,11 +16,26 @@ Function GetConstants() as object
     const.SPRITES_C64 = 1 'Commodore 64
     const.SPRITES_IBM = 2 'IBM PC
     const.SPRITES_A8B = 3 'Atari 8 bits
-    const.SPRITES_RND = 4 'Randomize
+    const.SPRITES_ZXS = 4 'ZX Spectrum
+    const.SPRITES_RND = 5 'Randomize
 
     const.VERSION_CLASSIC      = 0
     const.VERSION_CHAMPIONSHIP = 1
     const.VERSION_PROFESSIONAL = 2
+
+    const.SPEED_VERY_SLOW = 0
+    const.SPEED_SLOW      = 1
+    const.SPEED_NORMAL    = 2
+    const.SPEED_FAST      = 3
+    const.SPEED_VERY_FAST = 4
+
+    const.MENU_START    = 0
+    const.MENU_GRAPHICS = 1
+    const.MENU_VERSION  = 2
+    const.MENU_CONTROL  = 3
+    const.MENU_CHEATS   = 4
+    const.MENU_SPEED    = 5
+    const.MENU_CREDITS  = 6 
 
     const.TILE_WIDTH    = 20
     const.TILE_HEIGHT   = 22
@@ -50,19 +63,19 @@ Function GetConstants() as object
     const.ACT_RIGHT = 4
     const.ACT_DIG   = 5
 
-    const.MAP_EMPTY  = 0
-    const.MAP_BLOCK  = 1
-    const.MAP_SOLID  = 2
-    const.MAP_LADDR  = 3
-    const.MAP_BAR    = 4
-    const.MAP_TRAP   = 5
-    const.MAP_HLADR  = 6
-    const.MAP_GOLD   = 7
+    const.MAP_EMPTY = 0
+    const.MAP_BLOCK = 1
+    const.MAP_SOLID = 2
+    const.MAP_LADDR = 3
+    const.MAP_BAR   = 4
+    const.MAP_TRAP  = 5
+    const.MAP_HLADR = 6
+    const.MAP_GOLD  = 7
 
     const.SCORE_COMPLETE = 1500
-    const.SCORE_GOLD = 250
-    const.SCORE_FALL = 75
-    const.SCORE_DIES = 75
+    const.SCORE_GOLD     = 250
+    const.SCORE_FALL     = 75
+    const.SCORE_DIES     = 75
 
     const.CONTROL_VERTICAL   = 0
     const.CONTROL_HORIZONTAL = 1
@@ -74,6 +87,15 @@ Function GetConstants() as object
     const.CHARS_Z = 30
 
     return const
+End Function
+
+Function GetSpriteFolder(spritesId as integer) as string
+    folders = ["ap2", "c64", "ibm", "a8b", "zxs"]
+    if spritesId < folders.Count()
+        return folders[spritesId]
+    else
+        return "ap2"
+    end if
 End Function
 
 Function GetVersionMap(versionId as integer) as string
@@ -301,14 +323,21 @@ Sub SaveSettings(settings as object)
 End Sub
 
 Function LoadSettings() as dynamic
+    settings = invalid
     json = GetRegistryString("Settings")
     if json <> ""
         obj = ParseJSON(json)
         if obj <> invalid
-            return obj.settings
+            settings = obj.settings
         end if
     end if
-    return invalid
+    if settings = invalid then settings = {}
+    if settings.controlMode = invalid then settings.controlMode = m.const.CONTROL_VERTICAL
+    if settings.spriteMode = invalid then settings.spriteMode = m.const.SPRITES_AP2
+    if settings.version = invalid then settings.version = m.const.VERSION_CLASSIC
+    if settings.rewFF = invalid then settings.rewFF = m.const.REWFF_LEVEL
+    if settings.speed = invalid then settings.speed = m.const.SPEED_NORMAL
+    return settings
 End Function
 
 Function itostr(i as integer) as string

@@ -6,8 +6,6 @@
 ' **  Updated: September 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
-' **  https://github.com/SimonHung/LodeRunner - HTML5 version by Simon Hung
-' **
 ' ********************************************************************************************************
 ' ********************************************************************************************************
 
@@ -20,7 +18,9 @@ Function PlayGame() as boolean
     m.canvasX = Cint((m.mainWidth - m.gameWidth) / 2)
     m.canvasY = Cint((m.mainHeight - m.gameHeight) / 2)
     'Initialize flags and aux variables
-    m.speed = 30
+    m.guardsMoves = [[0, 0, 0], [0, 1, 1], [1, 1, 1], [1, 2, 1], [1, 2, 2], [2, 2, 2], [2, 2, 3]]
+    m.gameSpeeds = [80, 50, 30, 20, 10]
+    m.speed = m.gameSpeeds[m.settings.speed]
     m.debugMode = false
     m.gameOver = false
     m.level.redraw = true
@@ -66,8 +66,7 @@ Function PlayGame() as boolean
                 RunnerUpdate()
                 if m.level.redraw then DrawLevel()
                 HolesUpdate()
-                if m.guardFlag then GuardsUpdate()
-                m.guardFlag = not m.guardFlag
+                GuardsUpdate()
                 'SoundUpdate()
                 'Paint Screen
                 if m.level.status = m.const.LEVEL_STARTUP then LevelStartup()
@@ -76,7 +75,6 @@ Function PlayGame() as boolean
                 DrawStatusBar()
                 m.mainScreen.SwapBuffers()
                 m.clock.Mark()
-                CheckLevelSuccess()
                 'Check runner death
                 if not m.runner.alive
                     m.runner.health--
@@ -88,6 +86,7 @@ Function PlayGame() as boolean
                         exit while
                     end if
                 end if
+                CheckLevelSuccess()
             end if
         end if
     end while
@@ -152,15 +151,7 @@ Sub GameOver()
     else
         spriteMode = m.levelSprites[m.currentLevel]
     end if
-    if spriteMode = m.const.SPRITES_AP2
-        bmp = CreateObject("roBitmap", "pkg:/assets/images/ap2/game-over.png")
-    else if spriteMode = m.const.SPRITES_C64
-        bmp = CreateObject("roBitmap", "pkg:/assets/images/c64/game-over.png")
-    else if spriteMode = m.const.SPRITES_IBM
-        bmp = CreateObject("roBitmap", "pkg:/assets/images/ibm/game-over.png")
-    else if spriteMode = m.const.SPRITES_A8B
-        bmp = CreateObject("roBitmap", "pkg:/assets/images/a8b/game-over.png")
-    end if
+    bmp = CreateObject("roBitmap", "pkg:/assets/images/" + GetSpriteFolder(spriteMode) + "/game-over.png")
     x = Cint((m.gameWidth - bmp.GetWidth()) / 2)
     y = Cint((m.gameHeight - bmp.GetHeight()) / 2)
     rgn = CreateObject("roRegion", bmp, 0, 0, bmp.GetWidth(), bmp.GetHeight())
@@ -187,17 +178,28 @@ Sub RunnerUpdate()
         else
             m.runner.sprite.SetRegion(rnRegion)
             m.runner.sprite.MoveTo(x, y)
-        end if
-        'Check collision with guards
-        if not m.immortal
-            objList = m.runner.sprite.CheckMultipleCollisions()
-            if objList <> invalid then m.runner.alive = false
+            'Check collision with guards
+            if not m.immortal
+                if m.runner.sprite.CheckCollision() <> invalid
+                    m.runner.alive = false
+                end if
+            end if
         end if
     end if
 End Sub
 
 Sub GuardsUpdate()
-    for each guard in m.guards
+    guardsCount = m.guards.Count()
+    if guardsCount = 0 then return
+    if m.nextMoves = 2 then m.nextMoves = 0 else m.nextMoves++
+    if m.level.status = m.const.LEVEL_STARTUP
+        movesCount = guardsCount
+    else
+        movesCount = m.guardsMoves[guardsCount][m.nextMoves]
+    end if
+    while movesCount > 0
+        if m.nextGuard = guardsCount - 1 then m.nextGuard = 0 else m.nextGuard++
+        guard = m.guards[m.nextGuard]
         if not guard.alive
             for ty = 0 to m.const.TILES_Y-1
                 guard.blockX = Rnd(m.const.TILES_X) - 1
@@ -222,7 +224,8 @@ Sub GuardsUpdate()
                 guard.sprite.MoveTo(x, y)
             end if
         end if
-    next
+        movesCount--
+    end while
 End Sub
 
 Sub DrawLevel()

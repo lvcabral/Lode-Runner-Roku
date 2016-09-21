@@ -6,12 +6,15 @@
 ' **  Updated: September 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
-' **  https://github.com/SimonHung/LodeRunner - HTML5 version by Simon Hung
-' **
 ' ********************************************************************************************************
 ' ********************************************************************************************************
 
 Sub DrawStatusBar()
+    if m.settings.spriteMode < m.const.SPRITES_RND
+        spriteMode = m.settings.spriteMode
+    else
+        spriteMode = m.levelSprites[m.currentLevel]
+    end if
     x = 0
     y = m.const.TILES_Y * m.const.TILE_HEIGHT
     ground = m.regions.tiles.Lookup("ground")
@@ -19,30 +22,29 @@ Sub DrawStatusBar()
         m.gameScreen.DrawObject(x + i * m.const.TILE_WIDTH, y, ground)
     next
     y += m.const.GROUND_HEIGHT
-    x = WriteText(m.gameScreen, "SCORE", x, y)
+    if spriteMode = m.const.SPRITES_ZXS
+        x = WriteText(m.gameScreen, "SCORE ", x, y)
+    else
+        x = WriteText(m.gameScreen, "SCORE", x, y)
+    end if
     x = WriteText(m.gameScreen, zeroPad(m.runner.score, 7), x, y)
-    x = WriteText(m.gameScreen, " MEN", x, y)
+    if spriteMode = m.const.SPRITES_ZXS
+        x = WriteText(m.gameScreen, " LIVES ", x, y)
+    else
+        x = WriteText(m.gameScreen, " MEN", x, y)
+    end if
     x = WriteText(m.gameScreen, zeroPad(m.runner.health, 3), x, y)
-    x = WriteText(m.gameScreen, " LEVEL", x, y)
+    if spriteMode = m.const.SPRITES_ZXS
+        x = WriteText(m.gameScreen, " LEVL", x, y)
+    else
+        x = WriteText(m.gameScreen, " LEVEL", x, y)
+    end if
     x = WriteText(m.gameScreen, zeroPad(m.currentLevel, 3), x, y)
-    DrawLogo()
+    DrawLogo(spriteMode)
 End Sub
 
-Sub DrawLogo()
-    if m.settings.spriteMode < m.const.SPRITES_RND
-        spriteMode = m.settings.spriteMode
-    else
-        spriteMode = m.levelSprites[m.currentLevel]
-    end if
-    if spriteMode = m.const.SPRITES_AP2
-        bmp = CreateObject("roBitmap", "pkg:/assets/images/ap2/logo.png")
-    else if spriteMode = m.const.SPRITES_C64
-        bmp = CreateObject("roBitmap", "pkg:/assets/images/c64/logo.png")
-    else if spriteMode = m.const.SPRITES_IBM
-        bmp = CreateObject("roBitmap", "pkg:/assets/images/ibm/logo.png")
-    else if spriteMode = m.const.SPRITES_A8B
-        bmp = CreateObject("roBitmap", "pkg:/assets/images/a8b/logo.png")
-    end if
+Sub DrawLogo(spriteMode as integer)
+    bmp = CreateObject("roBitmap", "pkg:/assets/images/" + GetSpriteFolder(spriteMode) + "/logo.png")
     m.gameBottom.Clear(&HFF)
     x = Cint((m.gameBottom.GetWidth() - bmp.GetWidth()) / 2)
     y = Cint((m.gameBottom.GetHeight() - bmp.GetHeight()) / 2)
