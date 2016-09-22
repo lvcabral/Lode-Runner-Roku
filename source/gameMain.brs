@@ -14,7 +14,7 @@ Sub Main()
     'Constants
     m.code = bslUniversalControlEventCodes()
     m.const = GetConstants()
-    m.colors = { red: &hAA0000FF, green:&h00AA00FF, yellow: &hFFFF55FF, black: &hFF, white: &hFFFFFFFF, gray: &h404040FF, navy: &h080030FF, darkred: &h810000FF }
+    m.colors = {black: &hFF, white: &hFFFFFFFF}
     'Util objects
     app = CreateObject("roAppManager")
     app.SetTheme(GetTheme())
@@ -23,13 +23,14 @@ Sub Main()
     m.audioPlayer = CreateObject("roAudioPlayer")
     m.audioPort = CreateObject("roMessagePort")
     m.audioPlayer.SetMessagePort(m.audioPort)
-    'm.sounds = LoadSounds(true)
+    m.sounds = LoadSounds(true)
     m.files = CreateObject("roFileSystem")
     m.manifest = GetManifestArray()
     m.settings = LoadSettings()
     'Debug switches
     m.stopGuards = false ' flag to enable/disable guards
     m.immortal = false 'flag to enable/disable runner immortality
+    m.isOpenGL = isOpenGL()
     'Main Menu Loop
     while true
         'Configure screen/game areas based on the configuration
@@ -51,6 +52,10 @@ Sub Main()
 End Sub
 
 Sub PlayIntro(waitTime as integer)
+    if not m.isOpenGL
+        m.mainScreen.Clear(0)
+        m.mainScreen.SwapBuffers()
+    end if
     if m.settings.spriteMode < m.const.SPRITES_RND
         spriteMode = m.settings.spriteMode
     else
@@ -125,7 +130,7 @@ Sub ResetGame()
     g.nextGuard = 0
     g.nextMoves = 0
     g.level.redraw = true
-    'StopAudio()
+    StopAudio()
 End Sub
 
 Sub LoadGameSprites(spriteMode as integer)

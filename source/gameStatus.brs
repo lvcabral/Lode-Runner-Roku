@@ -45,7 +45,7 @@ End Sub
 
 Sub DrawLogo(spriteMode as integer)
     bmp = CreateObject("roBitmap", "pkg:/assets/images/" + GetSpriteFolder(spriteMode) + "/logo.png")
-    m.gameBottom.Clear(&HFF)
+    m.gameBottom.Clear(m.colors.black)
     x = Cint((m.gameBottom.GetWidth() - bmp.GetWidth()) / 2)
     y = Cint((m.gameBottom.GetHeight() - bmp.GetHeight()) / 2)
     m.gameBottom.DrawObject(x, y, bmp)

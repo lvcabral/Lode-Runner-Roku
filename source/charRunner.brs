@@ -15,6 +15,7 @@ Function CreateRunner(level as object) as object
     this.const = m.const
 	'Controller
 	this.cursors = GetCursors(m.settings.controlMode)
+    this.sounds = m.sounds
     'Properties
     this.charType = "runner"
     this.score = 0
@@ -70,6 +71,14 @@ Sub update_runner()
         m.move(m.const.ACT_RIGHT)
     else
         m.move(m.const.ACT_NONE)
+    end if
+    'Falling sound
+    if m.state = m.STATE_FALL
+        if m.sounds.wav.clip <> "fall" or m.sounds.wav.cycles = 0
+            PlaySound("fall")
+        end if
+    else if m.sounds.wav.clip = "fall"
+        StopSound()
     end if
     'Restore after dig
     if Left(m.charAction, 3) = "dig" and m.state <> m.STATE_MOVE

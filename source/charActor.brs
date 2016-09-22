@@ -32,11 +32,15 @@ Sub move_actor(action)
     if curTile.base = m.const.MAP_GOLD
         takeGold = false
         if m.charType = "runner"
+            PlaySound("getGold")
             m.level.gold--
             m.score += m.const.SCORE_GOLD
             takeGold = true
-        else if not m.hasGold
-            m.hasGold = true
+            if m.level.gold = 0
+                PlaySound("goldFinish" + itostr((m.level.number - 1) MOD 6 + 1))
+            end if
+        else if m.hasGold = 0
+            m.hasGold = Rnd(26) + 12
             takeGold = true
         end if
         if takeGold
@@ -63,6 +67,7 @@ Sub move_actor(action)
         end if
     else if action = m.const.ACT_DIG and m.charType = "runner"
         if m.canDig()
+            PlaySound("dig")
             if m.keyDL() or (m.charAction = "runLeft" and not m.keyDR())
                 m.charAction = "digLeft"
                 tile = m.level.map[m.blockX-1][m.blockY+1]
@@ -75,7 +80,6 @@ Sub move_actor(action)
             tile.frame = 0
             tile.act = m.const.MAP_EMPTY
             tile.hole = true
-            print "dig"; tile
             m.state = m.STATE_MOVE
             m.offsetX = 0
             m.frame = 0
@@ -94,6 +98,7 @@ Sub move_actor(action)
                 if IsLadder(curTile, hladr) and not IsBarrier(upTile)
                     m.blockY--
                     m.offsetY += m.const.TILE_HEIGHT
+                    if m.charType = "guard" then m.tryDropGold()
                 else
                     m.offsetY = 0
                 end if
@@ -117,6 +122,7 @@ Sub move_actor(action)
                     m.charAction = "fallLeft"
                     m.frame = 0
                 end if
+                if m.charType = "guard" then m.tryDropGold()
             end if
         else if (curTile.base = m.const.MAP_BAR or curTile.base = m.const.MAP_EMPTY) and not IsFloor(downTile)
             m.state = m.STATE_FALL
@@ -144,6 +150,7 @@ Sub move_actor(action)
             if m.offsetX < 0
                 m.blockX--
                 m.offsetX += m.const.TILE_WIDTH
+                if m.charType = "guard" then m.tryDropGold()
             end if
             m.offsetY = 0
         end if
@@ -168,6 +175,7 @@ Sub move_actor(action)
             if m.offsetX >= m.const.TILE_WIDTH / 2
                 m.blockX++
                 m.offsetX -= m.const.TILE_WIDTH
+                if m.charType = "guard" then m.tryDropGold()
             end if
             m.offsetY = 0
         else if m.offsetX < 0
@@ -184,6 +192,7 @@ Sub move_actor(action)
             m.blockY++
             m.offsetY -= m.const.TILE_HEIGHT
             if m.offsetY < m.const.MOVE_Y then m.offsetY = 0
+            if m.charType = "guard" then m.tryDropGold()
         end if
     end if
 End Sub

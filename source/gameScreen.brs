@@ -19,10 +19,12 @@ Function PlayGame() as boolean
     m.canvasY = Cint((m.mainHeight - m.gameHeight) / 2)
     'Initialize flags and aux variables
     m.guardsMoves = [[0, 0, 0], [0, 1, 1], [1, 1, 1], [1, 2, 1], [1, 2, 2], [2, 2, 2], [2, 2, 3]]
-    m.gameSpeeds = [80, 50, 30, 20, 10]
+    if m.isOpenGL
+        m.gameSpeeds = [60, 40, 20, 15, 10]
+    else
+        m.gameSpeeds = [40, 25, 15, 10, 5]
+    end if
     m.speed = m.gameSpeeds[m.settings.speed]
-    m.debugMode = false
-    m.gameOver = false
     m.level.redraw = true
     'Game Loop
     m.clock.Mark()
@@ -32,13 +34,9 @@ Function PlayGame() as boolean
             'Handle Remote Control events
             id = event.GetInt()
             if id = m.code.BUTTON_BACK_PRESSED
-                m.audioPlayer.Stop()
+                StopAudio()
                 DestroyChars()
-                return false
-            else if m.gameOver
-                m.audioPlayer.Stop()
-                DestroyChars()
-                return true
+                exit while
             else if id = m.code.BUTTON_INSTANT_REPLAY_PRESSED
                 ResetGame()
             else if id = m.code.BUTTON_PLAY_PRESSED
@@ -67,7 +65,7 @@ Function PlayGame() as boolean
                 if m.level.redraw then DrawLevel()
                 HolesUpdate()
                 GuardsUpdate()
-                'SoundUpdate()
+                SoundUpdate()
                 'Paint Screen
                 if m.level.status = m.const.LEVEL_STARTUP then LevelStartup()
                 m.compositor.AnimationTick(ticks)
@@ -77,36 +75,43 @@ Function PlayGame() as boolean
                 m.clock.Mark()
                 'Check runner death
                 if not m.runner.alive
+                    PlaySound("dead")
                     m.runner.health--
                     if m.runner.health > 0
                         ResetGame()
                     else
                         GameOver()
+                        StopAudio()
                         DestroyChars()
-                        exit while
+                        return true
                     end if
                 end if
                 CheckLevelSuccess()
             end if
         end if
     end while
+    return false
 End Function
 
 Sub LevelStartup()
-    for i = 0 to 255 step 2
-        hexcolor = &hFF - i
-        bmpFront = GetPaintedBitmap(hexcolor, m.gameScreen.GetWidth(), m.gameScreen.GetHeight()-32, true)
-        rgnFront = CreateObject("roRegion", bmpFront, 0, 0, m.gameScreen.GetWidth(), m.gameScreen.GetHeight()-32)
-        if m.level.front = invalid
-            m.level.front = m.compositor.NewSprite(0, 0, rgnFront, 100)
-        else
-            m.level.front.SetRegion(rgnFront)
-        end if
-        m.compositor.DrawAll()
-        DrawStatusBar()
-        m.mainScreen.SwapBuffers()
-    next
-    m.level.front.Remove()
+    if m.isOpenGL
+        for i = 0 to 255 step 2
+            hexcolor = &hFF - i
+            width = m.gameScreen.GetWidth()
+            height = m.gameScreen.GetHeight() - 32
+            bmpFront = GetPaintedBitmap(hexcolor, width, height, true)
+            rgnFront = CreateObject("roRegion", bmpFront, 0, 0, width, height)
+            if m.level.front = invalid
+                m.level.front = m.compositor.NewSprite(0, 0, rgnFront, 100)
+            else
+                m.level.front.SetRegion(rgnFront)
+            end if
+            m.compositor.DrawAll()
+            DrawStatusBar()
+            m.mainScreen.SwapBuffers()
+        next
+        m.level.front.Remove()
+    end if
     while true
         key = wait(200, m.port)
         m.runner.sprite.SetDrawableFlag(not m.runner.sprite.GetDrawableFlag())
@@ -121,11 +126,14 @@ End Sub
 
 Sub CheckLevelSuccess()
     if m.runner.success
-        for s = 50 to m.const.SCORE_COMPLETE step 50
-            m.runner.score += 50
+        PlaySound("pass")
+        points = 0
+        for s = 100 to m.const.SCORE_COMPLETE step 100
+            m.runner.score += 100
             m.compositor.DrawAll()
             DrawStatusBar()
             m.mainScreen.SwapBuffers()
+            sleep(60)
         next
         if m.runner.health < m.const.LIMIT_HEALTH then m.runner.health++
         NextLevel()
@@ -136,7 +144,7 @@ Sub PauseGame()
     text = "PAUSED"
     x = Cint((m.gameWidth - (m.const.TILE_WIDTH * Len(text))) / 2)
     y = Cint((m.gameHeight - m.const.TILE_HEIGHT) / 2)
-    m.gameScreen.DrawRect(x - 6, y, (m.const.TILE_WIDTH * Len(text)) + 6, m.const.TILE_HEIGHT + 3, &HFF)
+    m.gameScreen.DrawRect(x - 6, y, (m.const.TILE_WIDTH * Len(text)) + 6, m.const.TILE_HEIGHT + 3, m.colors.black)
     WriteText(m.gameScreen, text, x, y)
     m.mainScreen.SwapBuffers()
     while true

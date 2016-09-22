@@ -6,8 +6,7 @@
 ' **  Updated: September 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
-' **  https://github.com/SimonHung/LodeRunner - HTML5 version by Simon Hung
-' **
+' **  Level sets ported from: https://github.com/SimonHung/LodeRunner_TotalRecall
 ' ********************************************************************************************************
 ' ********************************************************************************************************
 
@@ -96,14 +95,30 @@ Function CreateLevel(levelSet as string, levelId as integer) as object
     return this
 End Function
 
-Function IsBarrier(mapTile)
+Function IsBarrier(mapTile) as boolean
     return (mapTile = invalid or mapTile.act = m.const.MAP_BLOCK or mapTile.act = m.const.MAP_SOLID or mapTile.act = m.const.MAP_TRAP)
 End Function
 
-Function IsLadder(mapTile, hidden as boolean)
+Function IsLadder(mapTile, hidden as boolean) as boolean
     return mapTile <> invalid and (mapTile.act = m.const.MAP_LADDR or (mapTile.base = m.const.MAP_HLADR and hidden))
 End Function
 
-Function IsFloor(mapTile)
-    return (mapTile = invalid or mapTile.act = m.const.MAP_BLOCK or mapTile.act = m.const.MAP_SOLID or mapTile.act = m.const.MAP_LADDR or mapTile.guard)
+Function IsFloor(mapTile, useBase = false as boolean, useGuard = true as boolean) as boolean
+    if useBase
+        return (mapTile = invalid or mapTile.base = m.const.MAP_BLOCK or mapTile.base = m.const.MAP_SOLID or mapTile.base = m.const.MAP_LADDR or (useGuard and mapTile.guard))
+    else
+        return (mapTile = invalid or mapTile.act = m.const.MAP_BLOCK or mapTile.act = m.const.MAP_SOLID or mapTile.act = m.const.MAP_LADDR or (useGuard and mapTile.guard))
+    end if
+End Function
+
+Function IsBar(mapTile) as boolean
+    return mapTile <> invalid and mapTile.base = m.const.MAP_BAR
+End Function
+
+Function IsGold(mapTile) as boolean
+    return mapTile <> invalid and mapTile.base = m.const.MAP_GOLD
+End Function
+
+Function IsEmpty(mapTile) as boolean
+    return mapTile <> invalid and mapTile.base = m.const.MAP_EMPTY
 End Function

@@ -35,7 +35,7 @@ Function GetConstants() as object
     const.MENU_CONTROL  = 3
     const.MENU_CHEATS   = 4
     const.MENU_SPEED    = 5
-    const.MENU_CREDITS  = 6 
+    const.MENU_CREDITS  = 6
 
     const.TILE_WIDTH    = 20
     const.TILE_HEIGHT   = 22
@@ -293,6 +293,8 @@ Function GetManifestArray() as Object
     return aa
 End Function
 
+'------- Device Check Functions -------
+
 Function IsHD()
     di = CreateObject("roDeviceInfo")
     return (di.GetUIResolution().name <> "sd")
@@ -301,6 +303,12 @@ End Function
 Function IsfHD()
     di = CreateObject("roDeviceInfo")
     return(di.GetUIResolution() = "fhd")
+End Function
+
+Function IsOpenGL() as Boolean
+    di = CreateObject("roDeviceInfo")
+    model = Val(Left(di.GetModel(),1))
+    return (model = 3 or model = 4 or model = 6)
 End Function
 
 '------- Registry Functions -------

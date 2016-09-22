@@ -195,6 +195,10 @@ Function GetMenuItems(menu as object)
 End Function
 
 Sub ShowCredits(waitTime = 0 as integer)
+    if not m.isOpenGL
+        m.mainScreen.Clear(0)
+        m.mainScreen.SwapBuffers()
+    end if
     imgIntro = "pkg:/images/game_credits.png"
     screen = m.mainScreen
     bmp = CreateObject("roBitmap", imgIntro)
