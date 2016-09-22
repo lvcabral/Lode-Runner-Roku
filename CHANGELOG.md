@@ -8,7 +8,7 @@
 * Fix: Sometimes Guards not showing after complete
 * Fix: Sometimes when starting a level any key just kills the runner - #7
 
-#####v0.6 - 16-Sep-2016 - Simple Guards AI, Sounds and Credits
+#####v0.6 - 16-Sep-2016 - Simple Guards AI, Cheat Keys and Pause
 * Add: Simple Guards AI to validate animation
 * Add: Runner death with guards
 * Add: Cheat keys configuration (level or health)
@@ -19,7 +19,7 @@
 * Fix: Climb ladder into a brick
 * Fix: Complete level should be in blockY=0 and offsetY=0
 
-#####v0.5 - 15-Sep-2016 - New skins, Pause and refactored char abstraction
+#####v0.5 - 15-Sep-2016 - New skins and refactored char abstraction
 * Add: Additional graphics: IBM PC, Atari 8 bits
 * Add: Option to randomize graphics
 * Refactor: Abstracted common behavior and properties in charActor
