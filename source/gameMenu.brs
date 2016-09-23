@@ -195,17 +195,17 @@ Function GetMenuItems(menu as object)
 End Function
 
 Sub ShowCredits(waitTime = 0 as integer)
-    if not m.isOpenGL
-        m.mainScreen.Clear(0)
-        m.mainScreen.SwapBuffers()
+    screen = m.mainScreen
+    Sleep(250) ' Give time to Roku clear list screen from memory
+    if m.isOpenGL
+        screen.Clear(m.colors.black)
+        screen.SwapBuffers()
     end if
     imgIntro = "pkg:/images/game_credits.png"
-    screen = m.mainScreen
     bmp = CreateObject("roBitmap", imgIntro)
     centerX = Cint((screen.GetWidth() - bmp.GetWidth()) / 2)
     centerY = Cint((screen.GetHeight() - bmp.GetHeight()) / 2)
-    screen.Clear(0)
-    screen.SwapBuffers()
+    screen.Clear(m.colors.black)
     screen.DrawObject(centerX, centerY, bmp)
     screen.SwapBuffers()
 	while true

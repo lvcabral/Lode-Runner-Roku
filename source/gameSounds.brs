@@ -103,7 +103,6 @@ Sub StopSound()
         if wav <> invalid and wav.IsPlaying()
             wav.Stop()
         end if
-        print "stop "; g.sounds.wav.clip
         g.sounds.wav = {clip:"", priority:0, cycles:0}
     end if
 End Sub

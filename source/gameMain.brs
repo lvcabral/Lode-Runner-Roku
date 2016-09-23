@@ -52,9 +52,10 @@ Sub Main()
 End Sub
 
 Sub PlayIntro(waitTime as integer)
-    if not m.isOpenGL
-        m.mainScreen.Clear(0)
-        m.mainScreen.SwapBuffers()
+    screen = m.mainScreen
+    if m.isOpenGL
+        screen.Clear(m.colors.black)
+        screen.SwapBuffers()
     end if
     if m.settings.spriteMode < m.const.SPRITES_RND
         spriteMode = m.settings.spriteMode
@@ -62,12 +63,10 @@ Sub PlayIntro(waitTime as integer)
         spriteMode = m.levelSprites[m.currentLevel]
     end if
     imgIntro = "pkg:/assets/images/" + GetSpriteFolder(spriteMode) + "/start-screen.png"
-    screen = m.mainScreen
     bmp = CreateObject("roBitmap", imgIntro)
     centerX = Cint((screen.GetWidth() - bmp.GetWidth()) / 2)
     centerY = Cint((screen.GetHeight() - bmp.GetHeight()) / 2)
-    screen.Clear(0)
-    screen.SwapBuffers()
+    screen.Clear(m.colors.black)
     screen.DrawObject(centerX, centerY, bmp)
     screen.SwapBuffers()
 	while true
@@ -129,7 +128,6 @@ Sub ResetGame()
     next
     g.nextGuard = 0
     g.nextMoves = 0
-    g.level.redraw = true
     StopAudio()
     StopSound()
 End Sub

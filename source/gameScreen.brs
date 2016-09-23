@@ -25,7 +25,6 @@ Function PlayGame() as boolean
         m.gameSpeeds = [40, 25, 15, 10, 5]
     end if
     m.speed = m.gameSpeeds[m.settings.speed]
-    m.level.redraw = true
     'Game Loop
     m.clock.Mark()
     while true
@@ -62,8 +61,7 @@ Function PlayGame() as boolean
             if ticks > m.speed
                 'Update sprites
                 RunnerUpdate()
-                if m.level.redraw then DrawLevel()
-                HolesUpdate()
+                if m.level.redraw then DrawLevel() else RedrawTiles()
                 GuardsUpdate()
                 SoundUpdate()
                 'Paint Screen
@@ -237,9 +235,9 @@ Sub GuardsUpdate()
 End Sub
 
 Sub DrawLevel()
-    'Clear old stage sprites
+    'Clear old sprites
     DestroyStage()
-    'Draw level rooms
+    'Draw level
     for ty = m.const.TILES_Y-1 to 0 step -1
 		for tx = m.const.TILES_X-1 to 0 step -1
             tile = m.level.map[tx][ty]
@@ -261,7 +259,7 @@ Sub DrawLevel()
     m.level.redraw = false
 End Sub
 
-Sub HolesUpdate()
+Sub RedrawTiles()
     for ty = m.const.TILES_Y-1 to 0 step -1
 		for tx = m.const.TILES_X-1 to 0 step -1
             tile = m.level.map[tx][ty]
@@ -306,8 +304,24 @@ Sub HolesUpdate()
                         tile.sprite.SetMemberFlags(0)
                         tile.sprite.SetData(tile.bitmap)
                     end if
+                else if tile.redraw or m.level.gold = 0
+                    if tile.sprite <> invalid then tile.sprite.Remove()
+                    tileRegion = m.regions.tiles.Lookup(tile.bitmap)
+                    if tileRegion <> invalid
+                        x = tx * m.const.TILE_WIDTH
+                        y = ty * m.const.TILE_HEIGHT
+                        tile.sprite = m.compositor.NewSprite(x, y, tileRegion, m.const.TILES_Z)
+                        tile.sprite.SetMemberFlags(0)
+                        tile.sprite.SetData(tile.bitmap)
+                        if tile.base = m.const.MAP_HLADR
+                            tile.sprite.SetDrawableFlag(m.level.gold = 0)
+                        end if
+                    end if
                 end if
+            else
+                if tile.sprite <> invalid then tile.sprite.Remove()
             end if
+            tile.redraw = false
         next
     next
 End Sub

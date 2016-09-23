@@ -46,7 +46,7 @@ Sub move_actor(action)
         if takeGold
             m.level.map[m.blockX][m.blockY].base = m.const.MAP_EMPTY
             m.level.map[m.blockX][m.blockY].bitmap = invalid
-            m.level.redraw = true
+            m.level.map[m.blockX][m.blockY].redraw = true
         end if
     end if
     'Update char position
@@ -83,7 +83,6 @@ Sub move_actor(action)
             m.state = m.STATE_MOVE
             m.offsetX = 0
             m.frame = 0
-            m.level.redraw = true
         end if
     else if action = m.const.ACT_UP and not (IsBarrier(upTile) and m.offsetY = 0)
         if IsLadder(curTile, hladr) or (IsLadder(downTile, hladr) and m.offsetY > 0)

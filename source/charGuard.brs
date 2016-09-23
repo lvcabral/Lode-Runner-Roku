@@ -61,8 +61,8 @@ Sub update_guard(runnerPos as object)
         if curTile.hole and m.hasGold > 0
             m.level.map[m.blockX][m.blockY-1].base = m.const.MAP_GOLD
             m.level.map[m.blockX][m.blockY-1].bitmap = "gold"
+            m.level.map[m.blockX][m.blockY-1].redraw = true
             m.hasGold = -10
-            m.level.redraw = true
         end if
         'Process Guard in Hole
         if m.offsetY = 0 and not m.inHole
@@ -176,8 +176,8 @@ Sub try_drop_gold_guard()
         if IsEmpty(curTile) and IsFloor(downTile, true, false)
             m.level.map[m.blockX][m.blockY].base = m.const.MAP_GOLD
             m.level.map[m.blockX][m.blockY].bitmap = "gold"
+            m.level.map[m.blockX][m.blockY].redraw = true
             m.hasGold = -1
-            m.level.redraw = true
         end if
     else if m.hasGold < 0
         m.hasGold++

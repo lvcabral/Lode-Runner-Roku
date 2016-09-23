@@ -13,6 +13,7 @@
 Function CreateLevel(levelSet as string, levelId as integer) as object
     this = {number: levelId, gold: 0, status: m.const.LEVEL_STARTUP}
     this.animations = ParseJson(ReadAsciiFile("pkg:/assets/anims/hole.json"))
+    this.redraw = true
     if m.maps = invalid or m.maps.name <> levelSet
         'Load json
         path = "pkg:/assets/maps/"
@@ -32,7 +33,7 @@ Function CreateLevel(levelSet as string, levelId as integer) as object
 	for x = 0 to m.const.TILES_X - 1
 		map[x] = []
 		for y = 0 to m.const.TILES_Y
-			map[x][y] = {hole: false, guard: false}
+			map[x][y] = {hole: false, guard: false, redraw: false}
 		next
 	next
 	'Fill Map
