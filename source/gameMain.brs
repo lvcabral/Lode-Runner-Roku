@@ -131,6 +131,7 @@ Sub ResetGame()
     g.nextMoves = 0
     g.level.redraw = true
     StopAudio()
+    StopSound()
 End Sub
 
 Sub LoadGameSprites(spriteMode as integer)
