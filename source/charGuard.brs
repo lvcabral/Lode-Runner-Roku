@@ -93,10 +93,10 @@ Sub update_guard(runnerPos as object)
                 m.offsetY -= m.const.MOVE_Y
                 if m.offsetY <= 0
                     m.offsetY = 0
-                    if x > runnerPos.x and not IsBarrier(leftTile)
+                    if not IsBarrier(leftTile) and (x > runnerPos.x or IsBarrier(rightTile))
                         m.charAction = "runLeft"
                         m.frame = 0
-                    else
+                    else if not IsBarrier(rightTile)
                         m.charAction = "runRight"
                         m.frame = 0
                     end if
@@ -123,7 +123,18 @@ Sub update_guard(runnerPos as object)
         if m.state = m.STATE_FALL or m.level.status = m.const.LEVEL_STARTUP
             m.move(m.const.ACT_NONE)
         else
-            m.move(m.bestMove(runnerPos))
+            nextAction = m.bestMove(runnerPos)
+            if nextAction = m.const.ACT_UP and not upTile.guard
+                m.move(nextAction)
+            else if nextAction = m.const.ACT_DOWN and not downTile.guard
+                m.move(nextAction)
+            else if nextAction = m.const.ACT_LEFT and not leftTile.guard
+                m.move(nextAction)
+            else if nextAction = m.const.ACT_RIGHT and not rightTile.guard
+                m.move(nextAction)
+            else
+                m.move(m.const.ACT_NONE)
+            end if
         end if
     else 'Simple AI for animation validation (deprecated)
         if m.state = m.STATE_FALL or m.inHole or m.level.status = m.const.LEVEL_STARTUP
@@ -178,8 +189,9 @@ Function best_move_guard(runnerPos as object) as integer
 	y = m.blockY
 	runnerX = runnerPos.x
 	runnerY = runnerPos.y
+    maxTileY = m.const.TILES_Y - 1
 	map = m.level.map
-	if y = runnerY
+	if y = runnerY or (runnerY = maxTileY and y = maxTileY - 1)
 		while x <> runnerX
 			if y < m.const.TILES_Y - 1
 				downTile = map[x][y + 1]
@@ -211,7 +223,7 @@ Function best_move_guard(runnerPos as object) as integer
 	return m.scanFloor(runnerPos)
 End Function
 
-function scan_floor_guard(runnerPos as object)
+Function scan_floor_guard(runnerPos as object) as integer
 	x = m.blockX
 	y = m.blockY
     maxTileX = m.const.TILES_X - 1
