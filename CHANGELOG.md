@@ -1,3 +1,13 @@
+#####v0.8 - 23-Sep-2016 - Original Guards AI, Sound Effects, ZX Spectrum sprites and Speed Configuration
+* Add: Ported original guards AI
+* Add: Sounds effects support
+* Add: Speed Configuration
+* Add: Credits Screen
+* Add: Sinclair ZX Spectrum sprites
+* Fix: Issues with low end Roku devices (list screen not cleared, fade-in flicks, performance)
+* Fix: Gold should be released just when guard falls in hole
+* Fix: Runner dies with any key at level start
+
 #####v0.7 - 17-Sep-2016 - Improved graphics and guard at hole update
 * Add: Guard exit hole (when have time)
 * Add: Pause text at the center of the screen
