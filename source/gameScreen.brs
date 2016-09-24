@@ -126,13 +126,13 @@ End Sub
 Sub CheckLevelSuccess()
     if m.runner.success
         PlaySound("pass")
-        points = 0
-        for s = 100 to m.const.SCORE_COMPLETE step 100
-            m.runner.score += 100
+        points = 100
+        for s = points to m.const.SCORE_COMPLETE step points
+            AddScore(points)
             m.compositor.DrawAll()
             DrawStatusBar()
             m.mainScreen.SwapBuffers()
-            sleep(60)
+            Sleep(60)
         next
         if m.runner.health < m.const.LIMIT_HEALTH then m.runner.health++
         NextLevel()
@@ -285,6 +285,7 @@ Sub RedrawTiles()
                                 for each guard in m.guards
                                     if guard.blockX = tx and guard.blockY = ty
                                         guard.alive = false
+                                        AddScore(m.const.SCORE_DIES)
                                         exit for
                                     end if
                                 next

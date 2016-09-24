@@ -34,7 +34,7 @@ Sub move_actor(action)
         if m.charType = "runner"
             PlaySound("getGold")
             m.level.gold--
-            m.score += m.const.SCORE_GOLD
+            AddScore(m.const.SCORE_GOLD)
             takeGold = true
             if m.level.gold = 0
                 PlaySound("goldFinish" + itostr((m.level.number - 1) MOD 6 + 1))

@@ -70,6 +70,7 @@ Sub update_guard(runnerPos as object)
             m.inHole = true
             m.charAction = m.charAction.Replace("fall", "shake")
             m.frame = 0
+            AddScore(m.const.SCORE_FALL)
         else if left(m.charAction, 5) = "shake"
             print "shaking", m.frame
             actionArray = m.animations.sequence.Lookup(m.charAction)

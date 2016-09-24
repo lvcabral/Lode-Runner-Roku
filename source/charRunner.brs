@@ -116,3 +116,8 @@ Function can_dig() as boolean
     end if
     return rsp
 End Function
+
+Sub AddScore(points as integer)
+    g = GetGlobalAA()
+    g.runner.score += points
+End Sub
