@@ -95,21 +95,21 @@ Function can_dig() as boolean
     rsp = false
     if (m.keyDL() or (m.charAction = "runLeft" and not m.keyDR())) and x > 1
         if y < m.const.TILES_Y and x > 0
-            if m.level.map[x-1][y+1].act = m.const.MAP_BLOCK
-                if m.level.map[x-1][y].act = m.const.MAP_EMPTY
-                    if m.level.map[x-1][y].base <> m.const.MAP_GOLD
-                        rsp = true
-                    end if
+            lTile = m.level.map[x-1][y+1]
+            dTile = m.level.map[x-1][y]
+            if lTile.act = m.const.MAP_BLOCK and dTile.act = m.const.MAP_EMPTY
+                if dTile.base <> m.const.MAP_GOLD and not dTile.guard
+                    rsp = true
                 end if
             end if
         end if
     else if (m.keyDR() or m.charAction = "runRight") and x < m.const.TILES_X - 2
         if y < m.const.TILES_Y and x < m.const.TILES_X
-            if m.level.map[x+1][y+1].act = m.const.MAP_BLOCK
-                if m.level.map[x+1][y].act = m.const.MAP_EMPTY
-                    if m.level.map[x+1][y].base <> m.const.MAP_GOLD
-                        rsp = true
-                    end if
+            rTile = m.level.map[x+1][y+1]
+            dTile = m.level.map[x+1][y]
+            if rTile.act = m.const.MAP_BLOCK and dTile.act = m.const.MAP_EMPTY
+                if dTile.base <> m.const.MAP_GOLD and not dTile.guard
+                    rsp = true
                 end if
             end if
         end if

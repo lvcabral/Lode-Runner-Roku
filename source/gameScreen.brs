@@ -74,6 +74,7 @@ Function PlayGame() as boolean
                 'Check runner death
                 if not m.runner.alive
                     PlaySound("dead")
+                    Sleep(800)
                     m.runner.health--
                     if m.runner.health > 0
                         ResetGame()
