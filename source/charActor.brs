@@ -104,6 +104,8 @@ Sub move_actor(action)
             end if
         end if
     else if action = m.const.ACT_DOWN and not IsBarrier(downTile)
+        downTile2 = invalid
+        if m.blockY < m.const.TILES_Y-2 then downTile2 = m.level.map[m.blockX][m.blockY + 2]
         if IsLadder(curTile, hladr) or IsLadder(downTile, hladr)
             if m.charAction <> "runUpDown"
                 m.charAction = "runUpDown"
@@ -116,7 +118,7 @@ Sub move_actor(action)
                 m.blockY++
                 m.offsetY -= m.const.TILE_HEIGHT
                 if m.offsetY < m.const.MOVE_Y then m.offsetY = 0
-                if not IsFloor(downTile)
+                if not IsFloor(downTile) and not IsFloor(downTile2)
                     m.state = m.STATE_FALL
                     m.charAction = "fallLeft"
                     m.frame = 0
