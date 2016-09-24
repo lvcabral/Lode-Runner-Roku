@@ -76,15 +76,13 @@ Sub PlaySoundWav(clip as string, overlap = false as boolean, volume = 75 as inte
     meta = g.sounds.metadata.clips.Lookup(clip)
     if meta <> invalid and (meta.priority >= ctrl.priority or ctrl.cycles = 0)
         sound = g.sounds.Lookup(clip)
-        if overlap or not sound.IsPlaying()
-            print "play sound wav: "; clip
-            StopSound()
-            sound.Trigger(volume)
-            ctrl.clip = clip
-            ctrl.priority = meta.priority
-            ctrl.cycles = cint(meta.duration / g.speed)
-            g.sounds.wav = ctrl
-        end if
+        'print "play sound wav: "; clip
+        StopSound()
+        sound.Trigger(volume)
+        ctrl.clip = clip
+        ctrl.priority = meta.priority
+        ctrl.cycles = cint(meta.duration / g.speed)
+        g.sounds.wav = ctrl
     end if
 End Sub
 
