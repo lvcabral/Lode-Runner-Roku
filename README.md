@@ -11,7 +11,7 @@ There are five selectable options of sprites, the original Apple II, the Commodo
 There are three different level sets: the Classic (150 levels), Championship (50 levels) and Professional (150 levels). 
 The level sets (and some assets) were converted from the [Javascript Lode Runner](https://github.com/SimonHung/LodeRunner_TotalRecall) project by Simon Hung.
 
-Pending features are: Original guards AI, high scores and save game.
+If you have a Roku or Roku TV you can install the preview channel using this link: https://my.roku.com/add/LodeRunnerPreview
 
 Click the image below to watch a video with the functionality up to version 0.7:
 
