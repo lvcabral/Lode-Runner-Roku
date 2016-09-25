@@ -45,7 +45,7 @@ Sub Main()
             'Open Game Screen
             ResetGame()
             PlayIntro(2000)
-            if PlayGame() then ShowHighScores()
+            if PlayGame() then ShowHighScores(5000)
         else if selection = m.const.MENU_CREDITS
             ShowCredits()
         else if selection = m.const.MENU_HISCORES

@@ -19,6 +19,7 @@ Function CreateRunner(level as object) as object
     'Properties
     this.charType = "runner"
     this.score = 0
+    this.usedCheat = false
     this.health = m.const.START_HEALTH
     'Methods
     this.startLevel = start_level_runner
@@ -46,6 +47,7 @@ Sub start_level_runner(level as object)
     m.charAction = "runRight"
     m.frameName = "runner_00"
     m.frame = 1
+    m.state = 0
     m.success = false
     m.cursors.reset()
 End Sub

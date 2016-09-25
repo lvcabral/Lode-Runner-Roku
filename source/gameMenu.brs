@@ -207,13 +207,14 @@ Function CheckHighScores() as boolean
     index = -1
     max = 10
     changed = false
-    newScores = m.highScores[m.settings.version]
-    if newScores.Count() = 0
+    oldScores = m.highScores[m.settings.version]
+    newScores = []
+    if oldScores.Count() = 0
         index = 0
         newScores.Push({name: "", level: m.currentLevel, points: m.runner.score})
     else
-        for each score in m.highScores
-            if m.points > m.runner.score and index < 0
+        for each score in oldScores
+            if m.runner.score > score.points and index < 0
                 index = counter
                 newScores.Push({name: "", level: m.currentLevel, points: m.runner.score})
                 counter++
@@ -230,12 +231,10 @@ Function CheckHighScores() as boolean
     end if
     if index >= 0
         playerName = KeyboardScreen("", "Please type your name (max 13 letters)")
-        if playerName = ""
-            playerName = "<NO NAME>"
-        else
-            playerName = padLeft(UCase(playerName), 13)
-        end if
+        if playerName = "" then playerName = "< NO NAME >"
+        playerName = padLeft(UCase(playerName), 13)
         newScores[index].name = playerName
+        m.highScores[m.settings.version] = newScores
         SaveHighScores(m.highScores)
         changed = true
     end if

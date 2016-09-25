@@ -25,6 +25,7 @@ Function PlayGame() as boolean
         m.gameSpeeds = [40, 25, 15, 10, 5]
     end if
     m.speed = m.gameSpeeds[m.settings.speed]
+    m.gameOver = false
     'Game Loop
     m.clock.Mark()
     while true
@@ -78,14 +79,18 @@ Function PlayGame() as boolean
                     if m.runner.health > 0
                         ResetGame()
                     else
-                        GameOver()
-                        StopAudio()
-                        changed = CheckHighScores()
-                        DestroyChars()
-                        return changed
+                        m.gameOver = true
                     end if
+                else
+                    m.gameOver = CheckLevelSuccess()
                 end if
-                CheckLevelSuccess()
+                if m.gameOver
+                    GameOver()
+                    StopAudio()
+                    changed = CheckHighScores()
+                    DestroyChars()
+                    return changed
+                end if
             end if
         end if
     end while
@@ -123,7 +128,8 @@ Sub LevelStartup()
     m.level.status = m.const.LEVEL_PLAYING
 End Sub
 
-Sub CheckLevelSuccess()
+Function CheckLevelSuccess() as boolean
+    finish = false
     if m.runner.success
         PlaySound("pass")
         points = 100
@@ -134,10 +140,15 @@ Sub CheckLevelSuccess()
             m.mainScreen.SwapBuffers()
             Sleep(60)
         next
-        if m.runner.health < m.const.LIMIT_HEALTH then m.runner.health++
-        NextLevel()
+        if m.currentLevel < m.maps.levels.total
+            if m.runner.health < m.const.LIMIT_HEALTH then m.runner.health++
+            NextLevel()
+        else
+            finish = true
+        end if
     end if
-End Sub
+    return finish
+End Function
 
 Sub PauseGame()
     text = "PAUSED"
@@ -167,7 +178,7 @@ Sub GameOver()
     DrawStatusBar()
     m.mainScreen.SwapBuffers()
     while true
-        key = wait(7000, m.port)
+        key = wait(5000, m.port)
 		if key = invalid or key < 100 then exit while
 	end while
     sprite.Remove()
