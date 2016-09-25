@@ -184,8 +184,7 @@ Sub GameOver()
 		if key = invalid or key < 100 then exit while
 	end while
     sprite.Remove()
-    m.savedGame = invalid
-    SaveGame()
+    ClearSavedGame()
 End Sub
 
 Sub RunnerUpdate()

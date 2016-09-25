@@ -290,7 +290,13 @@ Sub SaveGame()
     m.savedGame.level = m.currentLevel
     m.savedGame.health = m.runner.health
     m.savedGame.score = m.runner.score
+    m.savedGame.usedCheat = m.runner.usedCheat
     SaveRegistryString("SavedGame", FormatJSON({savedGame: m.savedGame}, 1))
+End Sub
+
+Sub ClearSavedGame()
+    m.savedGame = invalid
+    SaveRegistryString("SavedGame", FormatJSON({savedGame: invalid}, 1))
 End Sub
 
 Function LoadSavedGame() as dynamic

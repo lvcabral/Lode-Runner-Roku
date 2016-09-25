@@ -48,6 +48,7 @@ Sub Main()
                 ResetGame()
                 m.runner.health = m.savedGame.health
                 m.runner.score = m.savedGame.score
+                m.runner.usedCheat = m.savedGame.usedCheat
             else
                 m.currentLevel = 1
                 m.levelSprites = invalid
