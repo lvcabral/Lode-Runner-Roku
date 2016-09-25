@@ -27,6 +27,7 @@ Sub Main()
     m.files = CreateObject("roFileSystem")
     m.manifest = GetManifestArray()
     m.settings = LoadSettings()
+    m.savedGame = LoadSavedGame()
     m.highScores = LoadHighScores()
     'Debug switches
     m.stopGuards = false ' flag to enable/disable guards
@@ -40,10 +41,19 @@ Sub Main()
         selection = StartMenu()
         if selection = m.const.MENU_START
             print "Starting game..."
-            m.currentLevel = 1
-            m.levelSprites = invalid
+            if m.savedGame <> invalid and m.savedGame.restore
+                m.settings.version = m.savedGame.version
+                m.currentLevel = m.savedGame.level
+                m.levelSprites = invalid
+                ResetGame()
+                m.runner.health = m.savedGame.health
+                m.runner.score = m.savedGame.score
+            else
+                m.currentLevel = 1
+                m.levelSprites = invalid
+                ResetGame()
+            end if
             'Open Game Screen
-            ResetGame()
             PlayIntro(2000)
             if PlayGame() then ShowHighScores(5000)
         else if selection = m.const.MENU_CREDITS

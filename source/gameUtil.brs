@@ -190,14 +190,18 @@ Function IsOpenGL() as Boolean
 End Function
 
 '------- Roku Screens Functions ----
-Sub MessageDialog(title, text, port = invalid) As Integer
+Function MessageDialog(title, text, port = invalid) as integer
     if port = invalid then port = CreateObject("roMessagePort")
     d = CreateObject("roMessageDialog")
     d.SetTitle(title)
     d.SetText(text)
     d.SetMessagePort(port)
-    d.AddButton(1, "Okay")
+    d.AddButton(1, "Yes")
+    d.AddButton(2, "No")
+    d.AddButton(3, "Cancel")
+    d.EnableOverlay(true)
     d.Show()
+    result = 0
     while true
         msg = wait(0, port)
         if msg.isScreenClosed()
@@ -207,7 +211,8 @@ Sub MessageDialog(title, text, port = invalid) As Integer
             exit while
         end if
     end while
-End Sub
+    return result
+End Function
 
 Function KeyboardScreen(title = "", prompt = "", text = "", button1 = "Okay", button2= "Cancel", secure = false, port = invalid) as string
     if port = invalid then port = CreateObject("roMessagePort")
@@ -252,7 +257,7 @@ Function GetRegistryString(key as String, default = "") As String
     return default
 End Function
 
-Sub SaveRegistryString(key As String, value As String)
+Sub SaveRegistryString(key as string, value as string)
     sec = CreateObject("roRegistrySection", "LodeRunner")
     sec.Write(key, value)
     sec.Flush()
@@ -277,6 +282,26 @@ Function LoadSettings() as dynamic
     if settings.version = invalid then settings.version = m.const.VERSION_CLASSIC
     if settings.speed = invalid then settings.speed = m.const.SPEED_NORMAL
     return settings
+End Function
+
+Sub SaveGame()
+    if m.savedGame = invalid then m.savedGame = {}
+    m.savedGame.version = m.settings.version
+    m.savedGame.level = m.currentLevel
+    m.savedGame.health = m.runner.health
+    m.savedGame.score = m.runner.score
+    SaveRegistryString("SavedGame", FormatJSON({savedGame: m.savedGame}, 1))
+End Sub
+
+Function LoadSavedGame() as dynamic
+    json = GetRegistryString("SavedGame")
+    if json <> ""
+        obj = ParseJSON(json)
+        if obj <> invalid and obj.savedGame <> invalid
+            return obj.savedGame
+        end if
+    end if
+    return invalid
 End Function
 
 Sub SaveHighScores(scores as Object)

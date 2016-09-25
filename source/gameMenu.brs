@@ -50,7 +50,12 @@ Function StartMenu() as integer
                 selection = msg.GetIndex()
                 if selection = 0 'Play game
                     SaveSettings(m.settings)
-                    exit while
+                    res = 0
+                    if m.savedGame <> invalid
+                        res = MessageDialog("Lode Runner", "Do you want to continue unfinished game?", this.port)
+                        m.savedGame.restore = (res = 1)
+                    end if
+                    if res < 3 then exit while
                 else if selection >= listItems.Count() - 2
                     exit while
                 end if

@@ -78,6 +78,7 @@ Function PlayGame() as boolean
                     m.runner.health--
                     if m.runner.health > 0
                         ResetGame()
+                        SaveGame()
                     else
                         m.gameOver = true
                     end if
@@ -143,6 +144,7 @@ Function CheckLevelSuccess() as boolean
         if m.currentLevel < m.maps.levels.total
             if m.runner.health < m.const.LIMIT_HEALTH then m.runner.health++
             NextLevel()
+            SaveGame()
         else
             finish = true
         end if
@@ -182,6 +184,8 @@ Sub GameOver()
 		if key = invalid or key < 100 then exit while
 	end while
     sprite.Remove()
+    m.savedGame = invalid
+    SaveGame()
 End Sub
 
 Sub RunnerUpdate()
