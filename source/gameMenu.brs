@@ -31,8 +31,6 @@ Function StartMenu() as integer
     this.controlModes = ["Vertical Mode", "Horizontal Mode"]
     this.controlHelp  = ["", ""]
     this.controlImage = ["pkg:/images/control_vertical.png", "pkg:/images/control_horizontal.png"]
-    this.rewFFModes   = ["Game Level", "Life Counter"]
-    this.rewFFHelp    = ["REW & FF keys changes current level", "REW & FF increase/decrease life"]
     this.speedModes   = ["Very Slow", "Slow", "Normal", "Fast", "Very Fast"]
     this.speedHelp    = ["VERY SLOW", "SLOW", "NORMAL", "FAST", "VERY FAST"]
     listItems = GetMenuItems(this)
@@ -53,7 +51,7 @@ Function StartMenu() as integer
                 if selection = 0 'Play game
                     SaveSettings(m.settings)
                     exit while
-                else if selection = listItems.Count() - 1
+                else if selection >= listItems.Count() - 2
                     exit while
                 end if
             else if msg.isRemoteKeyPressed()
@@ -96,17 +94,6 @@ Function StartMenu() as integer
                     listItems[listIndex].ShortDescriptionLine1 = this.controlHelp[m.settings.controlMode]
                     listItems[listIndex].HDPosterUrl = this.controlImage[m.settings.controlMode]
                     listItems[listIndex].SDPosterUrl = this.controlImage[m.settings.controlMode]
-                    this.screen.SetItem(listIndex, listItems[listIndex])
-                else if listIndex = m.const.MENU_CHEATS
-                    if remoteKey = m.code.BUTTON_LEFT_PRESSED
-                        m.settings.rewFF--
-                        if m.settings.rewFF < 0 then m.settings.rewFF = this.rewFFModes.Count() - 1
-                    else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
-                        m.settings.rewFF++
-                        if m.settings.rewFF = this.rewFFModes.Count() then m.settings.rewFF = 0
-                    end if
-                    listItems[listIndex].Title = "Cheat Mode: " + this.rewFFModes[m.settings.rewFF]
-                    listItems[listIndex].ShortDescriptionLine1 = this.rewFFHelp[m.settings.rewFF]
                     this.screen.SetItem(listIndex, listItems[listIndex])
                 else if listIndex = m.const.MENU_SPEED
                     if remoteKey = m.code.BUTTON_LEFT_PRESSED
@@ -165,15 +152,6 @@ Function GetMenuItems(menu as object)
                 ShortDescriptionLine2: "Use Left and Right to set the control mode"
                 })
     listItems.Push({
-                Title: "Cheat Mode: " + menu.rewFFModes[m.settings.rewFF]
-                HDSmallIconUrl: "pkg:/images/icon_arrows.png"
-                SDSmallIconUrl: "pkg:/images/icon_arrows.png"
-                HDPosterUrl: "pkg:/images/brick_logo.png"
-                SDPosterUrl: "pkg:/images/brick_logo.png"
-                ShortDescriptionLine1: menu.rewFFHelp[m.settings.rewFF]
-                ShortDescriptionLine2: "Use Left and Right to set the cheat mode"
-                })
-    listItems.Push({
                 Title: "Game Speed: " + menu.speedModes[m.settings.speed]
                 HDSmallIconUrl: "pkg:/images/icon_arrows.png"
                 SDSmallIconUrl: "pkg:/images/icon_arrows.png"
@@ -181,6 +159,15 @@ Function GetMenuItems(menu as object)
                 SDPosterUrl: "pkg:/images/brick_logo.png"
                 ShortDescriptionLine1: menu.speedHelp[m.settings.speed]
                 ShortDescriptionLine2: "Use Left and Right to set the game speed"
+                })
+    listItems.Push({
+                Title: "High Scores"
+                HDSmallIconUrl: "pkg:/images/icon_hiscores.png"
+                SDSmallIconUrl: "pkg:/images/icon_hiscores.png"
+                HDPosterUrl: "pkg:/images/brick_logo.png"
+                SDPosterUrl: "pkg:/images/brick_logo.png"
+                ShortDescriptionLine1: ""
+                ShortDescriptionLine2: "Press OK to open High Scores"
                 })
     listItems.Push({
                 Title: "Game Credits"
@@ -212,4 +199,94 @@ Sub ShowCredits(waitTime = 0 as integer)
     	key = wait(waitTime, m.port)
 		if key = invalid or key < 100 then exit while
 	end while
+End Sub
+
+Function CheckHighScores() as boolean
+    if m.runner.usedCheat then return false
+    counter = 0
+    index = -1
+    max = 10
+    changed = false
+    newScores = m.highScores[m.settings.version]
+    if newScores.Count() = 0
+        index = 0
+        newScores.Push({name: "", level: m.currentLevel, points: m.runner.score})
+    else
+        for each score in m.highScores
+            if m.points > m.runner.score and index < 0
+                index = counter
+                newScores.Push({name: "", level: m.currentLevel, points: m.runner.score})
+                counter++
+                if counter = max then exit for
+            end if
+            newScores.Push(score)
+            counter++
+            if counter = max then exit for
+        next
+		if counter < max and index < 0
+			index = counter
+			newScores.Push({name: "", level: m.currentLevel, points: m.runner.score})
+		end if
+    end if
+    if index >= 0
+        playerName = KeyboardScreen("", "Please type your name (max 13 letters)")
+        if playerName = ""
+            playerName = "<NO NAME>"
+        else
+            playerName = padLeft(UCase(playerName), 13)
+        end if
+        newScores[index].name = playerName
+        SaveHighScores(m.highScores)
+        changed = true
+    end if
+    return changed
+End Function
+
+Sub ShowHighScores(waitTime = 0 as integer)
+    if m.regions = invalid then LoadGameSprites(m.settings.spriteMode)
+    screen = m.mainScreen
+    Sleep(250) ' Give time to Roku clear list screen from memory
+    if m.isOpenGL
+        screen.Clear(m.colors.black)
+        screen.SwapBuffers()
+    end if
+    'Draw Screen
+    bmp = CreateObject("roBitmap", {width:640, height:480, alphaenable:true})
+    border = 10
+    columns = m.const.TILES_X + 3
+    lineSpacing = (m.const.TILE_HEIGHT + 10)
+    x = border
+    y = m.const.TILE_HEIGHT
+    WriteText(bmp, padCenter(GetVersionMap(m.settings.version) + " LODE RUNNER", columns), x, y)
+    y += lineSpacing
+    WriteText(bmp, padCenter("HIGH SCORES", columns), x, y)
+    y += lineSpacing
+    WriteText(bmp, "NO      NAME      LEVEL  SCORE", x, y)
+    y += lineSpacing
+    ground = m.regions.tiles.Lookup("ground")
+    for i = 0 to columns - 1
+        bmp.DrawObject(x + i * m.const.TILE_WIDTH, y, ground)
+    next
+    y += (m.const.GROUND_HEIGHT + 7)
+    scores = m.highScores[m.settings.version]
+    for h = 1 to 10
+        x = WriteText(bmp, zeroPad(h) + ". ", x, y)
+        if h <= scores.Count()
+            x = WriteText(bmp, scores[h - 1].name + " ", x, y)
+            x = WriteText(bmp, " " + zeroPad(scores[h - 1].level, 3) + "  ", x, y)
+            x = WriteText(bmp, zeroPad(scores[h - 1].points, 7), x, y)
+        end if
+        x = border
+        y += lineSpacing
+    next
+    'Paint screen
+    centerX = Cint((screen.GetWidth() - bmp.GetWidth()) / 2)
+    centerY = Cint((screen.GetHeight() - bmp.GetHeight()) / 2)
+    screen.Clear(m.colors.black)
+    screen.DrawObject(centerX, centerY, bmp)
+    screen.SwapBuffers()
+    while true
+        key = wait(waitTime, m.port)
+        if key = invalid or key < 100 then exit while
+    end while
 End Sub

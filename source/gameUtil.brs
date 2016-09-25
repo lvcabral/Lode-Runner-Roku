@@ -33,8 +33,8 @@ Function GetConstants() as object
     const.MENU_GRAPHICS = 1
     const.MENU_VERSION  = 2
     const.MENU_CONTROL  = 3
-    const.MENU_CHEATS   = 4
-    const.MENU_SPEED    = 5
+    const.MENU_SPEED    = 4
+    const.MENU_HISCORES = 5
     const.MENU_CREDITS  = 6
 
     const.TILE_WIDTH    = 20
@@ -80,9 +80,6 @@ Function GetConstants() as object
     const.CONTROL_VERTICAL   = 0
     const.CONTROL_HORIZONTAL = 1
 
-    const.REWFF_LEVEL  = 0
-    const.REWFF_HEALTH = 1
-
     const.TILES_Z = 20
     const.CHARS_Z = 30
 
@@ -101,140 +98,6 @@ End Function
 Function GetVersionMap(versionId as integer) as string
     versionMaps = ["classic", "championship", "professional"]
     return versionMaps[versionId]
-End Function
-
-Function GetCursors(controlMode as integer) as object
-    this = {
-            code: bslUniversalControlEventCodes()
-            up: false
-            down: false
-            left: false
-            right: false
-            dig: false
-            digLeft: false
-            digRight: false
-           }
-    if controlMode = m.const.CONTROL_VERTICAL
-        this.update = update_cursor_vertical
-    else
-        this.update = update_cursor_horizontal
-    end if
-    this.reset = reset_cursors
-    return this
-End Function
-
-Sub update_cursor_vertical(id as integer, shiftToggle as boolean)
-    if id = m.code.BUTTON_UP_PRESSED
-        m.up = true
-        m.down = false
-    else if id = m.code.BUTTON_DOWN_PRESSED
-        m.up = false
-        m.down = true
-    else if id = m.code.BUTTON_LEFT_PRESSED
-        m.left = true
-        m.right = false
-    else if id = m.code.BUTTON_RIGHT_PRESSED
-        m.left = false
-        m.right = true
-    else if id = m.code.BUTTON_SELECT_PRESSED
-        m.dig = true
-    else if id = m.code.BUTTON_A_PRESSED
-        m.digLeft = true
-        m.dig = true
-    else if id = m.code.BUTTON_B_PRESSED
-        m.digRight = true
-        m.dig = true
-    else if id = m.code.BUTTON_UP_RELEASED
-        m.up = false
-    else if id = m.code.BUTTON_DOWN_RELEASED
-        m.down = false
-    else if id = m.code.BUTTON_LEFT_RELEASED
-        m.left = false
-    else if id = m.code.BUTTON_RIGHT_RELEASED
-        m.right = false
-    else if id = m.code.BUTTON_SELECT_RELEASED
-        m.dig = false
-    else if id = m.code.BUTTON_A_RELEASED
-        m.digLeft = false
-        m.dig = false
-    else if id = m.code.BUTTON_B_RELEASED
-        m.digRight = false
-        m.dig = false
-    end if
-End Sub
-
-Sub update_cursor_horizontal(id as integer, shiftToggle as boolean)
-    if id = m.code.BUTTON_RIGHT_PRESSED
-        m.up = true
-    else if id = m.code.BUTTON_LEFT_PRESSED
-        m.down = true
-    else if id = m.code.BUTTON_UP_PRESSED
-        m.left = true
-    else if id = m.code.BUTTON_DOWN_PRESSED
-        m.right = true
-    else if id = m.code.BUTTON_SELECT_PRESSED
-        m.dig = true
-    else if id = m.code.BUTTON_A_PRESSED
-        m.digLeft = true
-        m.dig = true
-    else if id = m.code.BUTTON_B_PRESSED
-        m.digRight = true
-        m.dig = true
-    else if id = m.code.BUTTON_RIGHT_RELEASED
-        m.up = false
-    else if id = m.code.BUTTON_LEFT_RELEASED
-        m.down = false
-    else if id = m.code.BUTTON_UP_RELEASED
-        m.left = false
-    else if id = m.code.BUTTON_DOWN_RELEASED
-        m.right = false
-    else if id = m.code.BUTTON_SELECT_RELEASED
-        m.dig = false
-    else if id = m.code.BUTTON_A_RELEASED
-        m.digLeft = false
-        m.dig = false
-    else if id = m.code.BUTTON_B_RELEASED
-        m.digRight = false
-        m.dig = false
-    end if
-End Sub
-
-Sub reset_cursors()
-    m.up = false
-    m.down = false
-    m.left = false
-    m.right = false
-    m.dig = false
-    m.digLeft = false
-    m.digRight = false
-End Sub
-
-Function key_u() as boolean
-    return m.cursors.up
-End Function
-
-Function key_d() as boolean
-    return m.cursors.down
-End Function
-
-Function key_l() as boolean
-    return m.cursors.left
-End Function
-
-Function key_r() as boolean
-    return m.cursors.right
-End Function
-
-Function key_dg() as boolean
-    return m.cursors.dig
-End Function
-
-Function key_dl() as boolean
-    return m.cursors.digLeft
-End Function
-
-Function key_dr() as boolean
-    return m.cursors.digRight
 End Function
 
 Function LoadBitmapRegions(path as string, jsonFile as string, pngFile = "" as string) as object
@@ -281,6 +144,21 @@ Function GetPaintedBitmap(color as integer, width as integer, height as integer,
     return bitmap
 End Function
 
+Function ScaleBitmap(bitmap as object, scale as float, simpleMode = false as boolean) as object
+    if scale = 1.0
+        scaled = bitmap
+    else if scale = int(scale) or simpleMode
+		scaled = CreateObject("roBitmap",{width:int(bitmap.GetWidth()*scale), height:int(bitmap.GetHeight()*scale), alphaenable:bitmap.GetAlphaEnable()})
+		scaled.DrawScaledObject(0,0,scale,scale,bitmap)
+    else
+        region = CreateObject("roRegion", bitmap, 0, 0, bitmap.GetWidth(), bitmap.GetHeight())
+        region.SetScaleMode(1)
+        scaled = CreateObject("roBitmap",{width:int(bitmap.GetWidth()*scale), height:int(bitmap.GetHeight()*scale), alphaenable:bitmap.GetAlphaEnable()})
+        scaled.DrawScaledObject(0,0,scale,scale,region)
+	end if
+    return scaled
+End Function
+
 Function GetManifestArray() as Object
     manifest = ReadAsciiFile("pkg:/manifest")
     lines = manifest.Tokenize(chr(10))
@@ -310,6 +188,60 @@ Function IsOpenGL() as Boolean
     model = Val(Left(di.GetModel(),1))
     return (model = 3 or model = 4 or model = 6)
 End Function
+
+'------- Roku Screens Functions ----
+Sub MessageDialog(title, text, port = invalid) As Integer
+    if port = invalid then port = CreateObject("roMessagePort")
+    d = CreateObject("roMessageDialog")
+    d.SetTitle(title)
+    d.SetText(text)
+    d.SetMessagePort(port)
+    d.AddButton(1, "Okay")
+    d.Show()
+    while true
+        msg = wait(0, port)
+        if msg.isScreenClosed()
+            exit while
+        else if msg.isButtonPressed()
+            result = msg.GetIndex()
+            exit while
+        end if
+    end while
+End Sub
+
+Function KeyboardScreen(title = "", prompt = "", text = "", button1 = "Okay", button2= "Cancel", secure = false, port = invalid) as string
+    if port = invalid then port = CreateObject("roMessagePort")
+    result = ""
+    port = CreateObject("roMessagePort")
+    screen = CreateObject("roKeyboardScreen")
+    screen.SetMessagePort(port)
+    screen.SetTitle(title)
+    screen.SetDisplayText(prompt)
+    screen.SetText(text)
+    screen.AddButton(1, button1)
+    screen.AddButton(2, button2)
+    screen.SetSecureText(secure)
+    screen.Show()
+    while true
+        msg = wait(0, port)
+
+        if type(msg) = "roKeyboardScreenEvent" then
+            if msg.isScreenClosed()
+                exit while
+            else if msg.isButtonPressed()
+                if msg.GetIndex() = 1 and screen.GetText().Trim() <> "" 'Ok
+                    result = screen.GetText()
+                    exit while
+                else if msg.GetIndex() = 2 'Cancel
+                    result = ""
+                    exit while
+                end if
+            end if
+        end if
+    end while
+    screen.Close()
+    return result
+End function
 
 '------- Registry Functions -------
 Function GetRegistryString(key as String, default = "") As String
@@ -343,10 +275,30 @@ Function LoadSettings() as dynamic
     if settings.controlMode = invalid then settings.controlMode = m.const.CONTROL_VERTICAL
     if settings.spriteMode = invalid then settings.spriteMode = m.const.SPRITES_AP2
     if settings.version = invalid then settings.version = m.const.VERSION_CLASSIC
-    if settings.rewFF = invalid then settings.rewFF = m.const.REWFF_LEVEL
     if settings.speed = invalid then settings.speed = m.const.SPEED_NORMAL
     return settings
 End Function
+
+Sub SaveHighScores(scores as Object)
+    if scores <> invalid
+        SaveRegistryString("HighScores", FormatJSON({highScores: scores}, 1))
+    end if
+End Sub
+
+Function LoadHighScores() as Dynamic
+    highScores = invalid
+    json = GetRegistryString("HighScores")
+    if json <> ""
+        obj = ParseJSON(json)
+        if obj <> invalid and obj.highScores <> invalid
+            highScores = obj.highScores
+        end if
+    end if
+    if highScores = invalid then highScores = [[],[],[]]
+    return highScores
+End Function
+
+'------- String Functions -------
 
 Function itostr(i as integer) as string
     str = Stri(i)
@@ -365,6 +317,33 @@ Function zeroPad(number as integer, length = invalid) as string
     if text.Len() < length
         for i = 1 to length-text.Len()
             text = "0" + text
+        next
+    end if
+    return text
+End Function
+
+Function padCenter(text as string, size as integer) as string
+    if Len(text) > size then text.Left(text, size)
+    if Len(text) < size
+        left = ""
+        right = ""
+        for c = 1 to size - Len(text)
+            if c mod 2 = 0
+                left += " "
+            else
+                right += " "
+            end if
+        next
+        text = left + text + right
+    end if
+    return text
+End Function
+
+Function padLeft(text as string, size as integer) as string
+    if Len(text) > size then text.Left(text, size)
+    if Len(text) < size
+        for c = 1 to size - Len(text)
+            text += " "
         next
     end if
     return text

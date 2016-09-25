@@ -51,49 +51,33 @@ Sub DrawLogo(spriteMode as integer)
     m.gameBottom.DrawObject(x, y, bmp)
 End Sub
 
-Function WriteText(screen as object, text as string, x as integer, y as integer) as integer
+Function WriteText(canvas as object, text as string, x as integer, y as integer) as integer
     text = UCase(text)
     for c = 0 to len(text) - 1
         ci = asc(text.mid(c,1))
         'Convert accented characters not supported by the font
-        if ci > 191 and ci < 199
+        if (ci > 191 and ci < 199) or (ci > 223 and ci < 231) 'A
             ci = 65
-        else if ci = 199
+        else if ci = 199 or ci = 231 'C
             ci = 67
-        else if ci > 199 and ci < 204
+        else if (ci > 199 and ci < 204) or (ci > 231 and ci < 236) 'E
             ci = 69
-        else if ci > 203 and ci < 208
+        else if (ci > 203 and ci < 208) or (ci > 235 and ci < 240) 'I
             ci = 73
-        else if ci = 208
+        else if ci = 208 'D
             ci = 68
-        else if ci = 209
+        else if ci = 209 or ci = 241 'N
             ci = 78
-        else if ci > 209 and ci < 215
+        else if (ci > 209 and ci < 215) or (ci > 241 and ci < 247)'O
             ci = 79
-        else if ci = 215
-            ci = 120
-        else if ci = 216
+        else if ci = 215 'X
+            ci = 88
+        else if ci = 216 '0
             ci = 48
-        else if ci > 216 and ci < 221
+        else if (ci > 216 and ci < 221) or (ci > 248 and ci < 253) 'U
             ci = 85
-        else if ci = 221
+        else if ci = 221 'Y
             ci = 89
-        else if ci > 223 and ci < 231
-            ci = 97
-        else if ci = 231
-            ci = 99
-        else if ci > 231 and ci < 236
-            ci = 101
-        else if ci > 235 and ci < 240
-            ci = 105
-        else if ci = 240
-            ci = 100
-        else if ci = 241
-            ci = 110
-        else if ci > 241 and ci < 247
-            ci = 111
-        else if ci > 248 and ci < 253
-            ci = 117
         else if ci > 160
             ci = 32
         end if
@@ -101,10 +85,9 @@ Function WriteText(screen as object, text as string, x as integer, y as integer)
         char = chr(ci)
         if ci = 32 then char = "space"
         letter = m.regions.text.Lookup(char)
-        if letter <> invalid
-            screen.DrawObject(x, y, letter)
-            x += letter.GetWidth()
-        end if
+        if letter = invalid then letter = m.regions.text.Lookup("space")
+        canvas.DrawObject(x, y, letter)
+        x += letter.GetWidth()
     next
     return x
 End Function

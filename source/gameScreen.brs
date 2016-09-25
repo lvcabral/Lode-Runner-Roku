@@ -40,18 +40,17 @@ Function PlayGame() as boolean
                 ResetGame()
             else if id = m.code.BUTTON_PLAY_PRESSED
                 PauseGame()
-            else if id = m.code.BUTTON_FAST_FORWARD_PRESSED
-                if m.settings.rewFF = m.const.REWFF_LEVEL
-                    NextLevel()
-                else if m.runner.health < m.const.LIMIT_HEALTH
+            else if id = m.code.BUTTON_INFO_PRESSED
+                if m.runner.health < m.const.LIMIT_HEALTH
                     m.runner.health++
+                    m.runner.usedCheat = true
                 end if
-            else if id = m.code.BUTTON_REWIND_PRESSED
-                if m.settings.rewFF = m.const.REWFF_LEVEL
-                    PreviousLevel()
-                else if m.runner.health > 0
-                    m.runner.health--
-                end if
+            else if ControlNextLevel(id)
+                NextLevel()
+                m.runner.usedCheat = true
+            else if ControlPreviousLevel(id)
+                PreviousLevel()
+                m.runner.usedCheat = true
             else
                 m.runner.cursors.update(id, false)
             end if
@@ -81,8 +80,9 @@ Function PlayGame() as boolean
                     else
                         GameOver()
                         StopAudio()
+                        changed = CheckHighScores()
                         DestroyChars()
-                        return true
+                        return changed
                     end if
                 end if
                 CheckLevelSuccess()
@@ -358,3 +358,15 @@ Sub DestroyStage()
         next
     next
 End Sub
+
+Function ControlNextLevel(id as integer) as boolean
+    vStatus = m.settings.controlMode = m.const.CONTROL_VERTICAL and id = m.code.BUTTON_A_PRESSED
+    hStatus = m.settings.controlMode = m.const.CONTROL_HORIZONTAL and id = m.code.BUTTON_FAST_FORWARD_PRESSED
+    return vStatus or hStatus
+End Function
+
+Function ControlPreviousLevel(id as integer) as boolean
+    vStatus = m.settings.controlMode = m.const.CONTROL_VERTICAL and id = m.code.BUTTON_B_PRESSED
+    hStatus = m.settings.controlMode = m.const.CONTROL_HORIZONTAL and id = m.code.BUTTON_REWIND_PRESSED
+    return vStatus or hStatus
+End Function

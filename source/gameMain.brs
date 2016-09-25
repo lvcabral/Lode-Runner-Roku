@@ -14,7 +14,7 @@ Sub Main()
     'Constants
     m.code = bslUniversalControlEventCodes()
     m.const = GetConstants()
-    m.colors = {black: &hFF, white: &hFFFFFFFF}
+    m.colors = {black: &hFF, white: &hFFFFFFFF, darkgray: &h0F0F0FFF}
     'Util objects
     app = CreateObject("roAppManager")
     app.SetTheme(GetTheme())
@@ -27,6 +27,7 @@ Sub Main()
     m.files = CreateObject("roFileSystem")
     m.manifest = GetManifestArray()
     m.settings = LoadSettings()
+    m.highScores = LoadHighScores()
     'Debug switches
     m.stopGuards = false ' flag to enable/disable guards
     m.immortal = false 'flag to enable/disable runner immortality
@@ -44,9 +45,11 @@ Sub Main()
             'Open Game Screen
             ResetGame()
             PlayIntro(2000)
-            PlayGame()
+            if PlayGame() then ShowHighScores()
         else if selection = m.const.MENU_CREDITS
             ShowCredits()
+        else if selection = m.const.MENU_HISCORES
+            ShowHighScores()
         end if
     end while
 End Sub
