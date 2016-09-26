@@ -1,3 +1,13 @@
+#####v0.9 - 25-Sep-2016 - Save Game and High Scores
+* Add: Save game status and option restore at the start #3
+* Add: Save and display High Scores for each version #2
+* Change: Remote keys reorganization
+* Fix: 75 Points should be added when a guard falls into a hole and also when it dies #16
+* Fix: Handle correctly the end of game (complete last level) #15
+* Fix: Sound effects are not overlapping #9
+* Fix: Dig should not be possible if guard is too close #14
+* Fix: Kid moving down from a ladder with a space before a brick starts falling #12
+
 #####v0.8 - 23-Sep-2016 - Original Guards AI, Sound Effects, ZX Spectrum sprites and Speed Configuration
 * Add: Ported original guards AI
 * Add: Sounds effects support
