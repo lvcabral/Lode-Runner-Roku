@@ -15,7 +15,7 @@ If you have a Roku or Roku TV you can install the preview channel using this lin
 
 Click the image below to watch a video with the functionality up to version 0.7:
 
-[![Lode Runner for Roku (v0.7 preview)](https://img.youtube.com/vi/jSCojR435eQ/0.jpg)](https://www.youtube.com/watch?v=jSCojR435eQ)
+[![Lode Runner for Roku (v0.7 preview)](http://lvcabral.com/LodeRunner/images/LodeRunnerYoutubeVideo07.png)](https://www.youtube.com/watch?v=jSCojR435eQ)
 
 Disclaimer: This source code shall not be used commercially or sold in any form, the objective of this project is educational.
 
