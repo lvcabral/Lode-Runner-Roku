@@ -1,5 +1,5 @@
 #####v0.9 - 25-Sep-2016 - Save Game and High Scores
-* Add: Save game status and option restore at the start #3
+* Add: Save game status and option to restore at the start #3
 * Add: Save and display High Scores for each version #2
 * Change: Remote keys reorganization
 * Fix: 75 Points should be added when a guard falls into a hole and also when it dies #16
