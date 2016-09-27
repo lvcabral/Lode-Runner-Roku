@@ -38,7 +38,7 @@ Function PlayGame() as boolean
                 DestroyChars()
                 exit while
             else if id = m.code.BUTTON_INSTANT_REPLAY_PRESSED
-                ResetGame()
+                m.runner.alive = false
             else if id = m.code.BUTTON_PLAY_PRESSED
                 PauseGame()
             else if id = m.code.BUTTON_INFO_PRESSED
@@ -265,6 +265,7 @@ Sub DrawLevel()
                     tile.sprite.SetMemberFlags(0)
                     tile.sprite.SetData(tile.bitmap)
                     if tile.base = m.const.MAP_HLADR
+                        if m.level.gold = 0 then tile.act = m.const.MAP_LADDR
                         tile.sprite.SetDrawableFlag(m.level.gold = 0)
                     end if
                 end if
@@ -320,7 +321,7 @@ Sub RedrawTiles()
                         tile.sprite.SetMemberFlags(0)
                         tile.sprite.SetData(tile.bitmap)
                     end if
-                else if tile.redraw or m.level.gold = 0
+                else if tile.redraw or ShowHiddenLadder(tile)
                     if tile.sprite <> invalid then tile.sprite.Remove()
                     tileRegion = m.regions.tiles.Lookup(tile.bitmap)
                     if tileRegion <> invalid
@@ -330,6 +331,7 @@ Sub RedrawTiles()
                         tile.sprite.SetMemberFlags(0)
                         tile.sprite.SetData(tile.bitmap)
                         if tile.base = m.const.MAP_HLADR
+                            if m.level.gold = 0 then tile.act = m.const.MAP_LADDR
                             tile.sprite.SetDrawableFlag(m.level.gold = 0)
                         end if
                     end if
@@ -372,6 +374,10 @@ Sub DestroyStage()
         next
     next
 End Sub
+
+Function ShowHiddenLadder(tile as object) as boolean
+    return tile.base = m.const.MAP_HLADR and tile.act = m.const.MAP_EMPTY and m.level.gold = 0
+End Function
 
 Function ControlNextLevel(id as integer) as boolean
     vStatus = m.settings.controlMode = m.const.CONTROL_VERTICAL and id = m.code.BUTTON_A_PRESSED
