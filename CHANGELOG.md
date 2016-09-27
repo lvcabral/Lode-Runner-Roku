@@ -1,12 +1,17 @@
-#####v0.9 - 25-Sep-2016 - Save Game and High Scores
+#####v0.9 - 26-Sep-2016 - Save Game and High Scores
 * Add: Save game status and option to restore at the start #3
 * Add: Save and display High Scores for each version #2
 * Change: Remote keys reorganization
+* Change: Use dynamic thumbnails on Version menu option #26
 * Fix: 75 Points should be added when a guard falls into a hole and also when it dies #16
 * Fix: Handle correctly the end of game (complete last level) #15
 * Fix: Sound effects are not overlapping #9
 * Fix: Dig should not be possible if guard is too close #14
 * Fix: Kid moving down from a ladder with a space before a brick starts falling #12
+* Fix: Using the button to restart the level should remove one life #25
+* Fix: The game becomes slower after the last gold is taken and the exit ladder is shown #24
+* Fix: Hidden ladder do not act like a real ladder so Level 11 can't be finished #23
+* Fix: Crash when a guard is climbing a ladder until the top of the screen #22
 
 #####v0.8 - 23-Sep-2016 - Original Guards AI, Sound Effects, ZX Spectrum sprites and Speed Configuration
 * Add: Ported original guards AI
