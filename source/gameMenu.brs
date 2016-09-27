@@ -26,8 +26,6 @@ Function StartMenu() as integer
     this.versionModes = ["Classic (1983)", "Championship (1984)", "Professional (1985)"]
     this.versionHelp  = ["150 original levels", "50 difficult levels created by fans",
                          "150 new levels by Dodosoft"]
-    this.versionImage = ["pkg:/images/version_classic.png", "pkg:/images/version_championship.png",
-                         "pkg:/images/version_professional.png"]
     this.controlModes = ["Vertical Mode", "Horizontal Mode"]
     this.controlHelp  = ["", ""]
     this.controlImage = ["pkg:/images/control_vertical.png", "pkg:/images/control_horizontal.png"]
@@ -61,6 +59,7 @@ Function StartMenu() as integer
                 end if
             else if msg.isRemoteKeyPressed()
                 remoteKey = msg.GetIndex()
+                update = (remoteKey = m.code.BUTTON_LEFT_PRESSED or remoteKey = m.code.BUTTON_RIGHT_PRESSED)
                 if listIndex = m.const.MENU_GRAPHICS
                     if remoteKey = m.code.BUTTON_LEFT_PRESSED
                         m.settings.spriteMode--
@@ -69,11 +68,16 @@ Function StartMenu() as integer
                         m.settings.spriteMode++
                         if m.settings.spriteMode = this.spriteModes.Count() then m.settings.spriteMode = 0
                     end if
-                    listItems[listIndex].Title = "Graphics: " + this.spriteModes[m.settings.spriteMode]
-                    listItems[listIndex].ShortDescriptionLine1 = this.spriteHelp[m.settings.spriteMode]
-                    listItems[listIndex].HDPosterUrl = this.spriteImage[m.settings.spriteMode]
-                    listItems[listIndex].SDPosterUrl = this.spriteImage[m.settings.spriteMode]
-                    this.screen.SetItem(listIndex, listItems[listIndex])
+                    if update
+                        listItems[listIndex].Title = "Graphics: " + this.spriteModes[m.settings.spriteMode]
+                        listItems[listIndex].ShortDescriptionLine1 = this.spriteHelp[m.settings.spriteMode]
+                        listItems[listIndex].HDPosterUrl = this.spriteImage[m.settings.spriteMode]
+                        listItems[listIndex].SDPosterUrl = this.spriteImage[m.settings.spriteMode]
+                        this.screen.SetItem(listIndex, listItems[listIndex])
+                        listItems[listIndex + 1].HDPosterUrl = GetLevelMapImage(m.settings.spriteMode, m.settings.version, 1)
+                        listItems[listIndex + 1].SDPosterUrl = GetLevelMapImage(m.settings.spriteMode, m.settings.version, 1)
+                        this.screen.SetItem(listIndex + 1, listItems[listIndex + 1])
+                    end if
                 else if listIndex = m.const.MENU_VERSION
                     if remoteKey = m.code.BUTTON_LEFT_PRESSED
                         m.settings.version--
@@ -82,11 +86,13 @@ Function StartMenu() as integer
                         m.settings.version++
                         if m.settings.version = this.versionModes.Count() then m.settings.version = 0
                     end if
-                    listItems[listIndex].Title = "Version: " + this.versionModes[m.settings.version]
-                    listItems[listIndex].ShortDescriptionLine1 = this.versionHelp[m.settings.version]
-                    listItems[listIndex].HDPosterUrl = this.versionImage[m.settings.version]
-                    listItems[listIndex].SDPosterUrl = this.versionImage[m.settings.version]
-                    this.screen.SetItem(listIndex, listItems[listIndex])
+                    if update
+                        listItems[listIndex].Title = "Version: " + this.versionModes[m.settings.version]
+                        listItems[listIndex].ShortDescriptionLine1 = this.versionHelp[m.settings.version]
+                        listItems[listIndex].HDPosterUrl = GetLevelMapImage(m.settings.spriteMode, m.settings.version, 1)
+                        listItems[listIndex].SDPosterUrl = GetLevelMapImage(m.settings.spriteMode, m.settings.version, 1)
+                        this.screen.SetItem(listIndex, listItems[listIndex])
+                    end if
                 else if listIndex = m.const.MENU_CONTROL
                     if remoteKey = m.code.BUTTON_LEFT_PRESSED
                         m.settings.controlMode--
@@ -95,11 +101,13 @@ Function StartMenu() as integer
                         m.settings.controlMode++
                         if m.settings.controlMode = this.controlModes.Count() then m.settings.controlMode = 0
                     end if
-                    listItems[listIndex].Title = "Control: " + this.controlModes[m.settings.controlMode]
-                    listItems[listIndex].ShortDescriptionLine1 = this.controlHelp[m.settings.controlMode]
-                    listItems[listIndex].HDPosterUrl = this.controlImage[m.settings.controlMode]
-                    listItems[listIndex].SDPosterUrl = this.controlImage[m.settings.controlMode]
-                    this.screen.SetItem(listIndex, listItems[listIndex])
+                    if update
+                        listItems[listIndex].Title = "Control: " + this.controlModes[m.settings.controlMode]
+                        listItems[listIndex].ShortDescriptionLine1 = this.controlHelp[m.settings.controlMode]
+                        listItems[listIndex].HDPosterUrl = this.controlImage[m.settings.controlMode]
+                        listItems[listIndex].SDPosterUrl = this.controlImage[m.settings.controlMode]
+                        this.screen.SetItem(listIndex, listItems[listIndex])
+                    end if
                 else if listIndex = m.const.MENU_SPEED
                     if remoteKey = m.code.BUTTON_LEFT_PRESSED
                         m.settings.speed--
@@ -108,9 +116,11 @@ Function StartMenu() as integer
                         m.settings.speed++
                         if m.settings.speed = this.speedModes.Count() then m.settings.speed = 0
                     end if
-                    listItems[listIndex].Title = "Game Speed: " + this.speedModes[m.settings.speed]
-                    listItems[listIndex].ShortDescriptionLine1 = this.speedHelp[m.settings.speed]
-                    this.screen.SetItem(listIndex, listItems[listIndex])
+                    if update
+                        listItems[listIndex].Title = "Game Speed: " + this.speedModes[m.settings.speed]
+                        listItems[listIndex].ShortDescriptionLine1 = this.speedHelp[m.settings.speed]
+                        this.screen.SetItem(listIndex, listItems[listIndex])
+                    end if
                 end if
             end if
         end if
@@ -142,8 +152,8 @@ Function GetMenuItems(menu as object)
                 Title: "Version: " + menu.versionModes[m.settings.version]
                 HDSmallIconUrl: "pkg:/images/icon_arrows.png"
                 SDSmallIconUrl: "pkg:/images/icon_arrows.png"
-                HDPosterUrl: menu.versionImage[m.settings.version]
-                SDPosterUrl: menu.versionImage[m.settings.version]
+                HDPosterUrl: GetLevelMapImage(m.settings.spriteMode, m.settings.version, 1)
+                SDPosterUrl: GetLevelMapImage(m.settings.spriteMode, m.settings.version, 1)
                 ShortDescriptionLine1: menu.versionHelp[m.settings.version]
                 ShortDescriptionLine2: "Use Left and Right to select a level set"
                 })
@@ -294,3 +304,33 @@ Sub ShowHighScores(waitTime = 0 as integer)
         if key = invalid or key < 100 then exit while
     end while
 End Sub
+
+Function GetLevelMapImage(spriteMode as integer, versionId as integer, levelId as integer) as string
+    LoadGameSprites(spriteMode)
+    mapName = GetVersionMap(versionId)
+    tmpFile = "tmp:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + ".png"
+    if not m.files.Exists(tmpFile)
+        'Load level map
+        level = CreateLevel(mapName, levelId)
+        'Canvas Bitmaps
+        bmp = CreateObject("roBitmap", {width:m.gameWidth, height:m.gameHeight, alphaenable:true})
+        'Draw level
+        for ty = m.const.TILES_Y-1 to 0 step -1
+            for tx = m.const.TILES_X-1 to 0 step -1
+                tile = level.map[tx][ty]
+                if tile.bitmap <> invalid
+                    tileRegion = m.regions.tiles.Lookup(tile.bitmap)
+                    if tileRegion <> invalid
+                        x = tx * m.const.TILE_WIDTH
+                        y = ty * m.const.TILE_HEIGHT
+                        bmp.DrawObject(x, y, tileRegion)
+                    end if
+                end if
+            next
+        next
+        bmp.Finish()
+        png = bmp.GetPng(0, 0, m.gameWidth, m.gameHeight)
+        png.WriteFile(tmpFile)
+    end if
+    return tmpFile
+End Function
