@@ -125,13 +125,13 @@ Sub update_guard(runnerPos as object)
             m.move(m.const.ACT_NONE)
         else
             nextAction = m.bestMove(runnerPos)
-            if nextAction = m.const.ACT_UP and not upTile.guard
+            if nextAction = m.const.ACT_UP and not HasGuard(upTile)
                 m.move(nextAction)
-            else if nextAction = m.const.ACT_DOWN and not downTile.guard
+            else if nextAction = m.const.ACT_DOWN and not HasGuard(downTile)
                 m.move(nextAction)
-            else if nextAction = m.const.ACT_LEFT and not leftTile.guard
+            else if nextAction = m.const.ACT_LEFT and not HasGuard(leftTile)
                 m.move(nextAction)
-            else if nextAction = m.const.ACT_RIGHT and not rightTile.guard
+            else if nextAction = m.const.ACT_RIGHT and not HasGuard(rightTile)
                 m.move(nextAction)
             else
                 m.move(m.const.ACT_NONE)
@@ -140,17 +140,17 @@ Sub update_guard(runnerPos as object)
     else 'Simple AI for animation validation (deprecated)
         if m.state = m.STATE_FALL or m.inHole or m.level.status = m.const.LEVEL_STARTUP
             m.move(m.const.ACT_NONE)
-        else if y > runnerPos.y and IsLadder(curTile, hladr) and not upTile.guard
+        else if y > runnerPos.y and IsLadder(curTile, hladr) and not HasGuard(upTile)
             m.move(m.const.ACT_UP)
-        else if y < runnerPos.y and IsLadder(downTile, hladr) and not downTile.guard
+        else if y < runnerPos.y and IsLadder(downTile, hladr) and not HasGuard(downTile)
             m.move(m.const.ACT_DOWN)
         else if y < runnerPos.y and curTile.base = m.const.MAP_BAR and not IsFloor(downTile)
             m.move(m.const.ACT_DOWN)
         else if y < runnerPos.y and IsLadder(curTile, hladr) and not IsFloor(downTile)
             m.move(m.const.ACT_DOWN)
-        else if x > runnerPos.x and not leftTile.guard
+        else if x > runnerPos.x and not HasGuard(leftTile)
             m.move(m.const.ACT_LEFT)
-        else if x < runnerPos.x and not rightTile.guard
+        else if x < runnerPos.x and not HasGuard(rightTile)
             m.move(m.const.ACT_RIGHT)
         else
             m.move(m.const.ACT_NONE)

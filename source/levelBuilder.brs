@@ -123,3 +123,7 @@ End Function
 Function IsEmpty(mapTile) as boolean
     return mapTile <> invalid and mapTile.base = m.const.MAP_EMPTY
 End Function
+
+Function HasGuard(mapTile) as boolean
+    return mapTile <> invalid and mapTile.guard
+End Function
