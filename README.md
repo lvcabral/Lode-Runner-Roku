@@ -9,7 +9,7 @@ I developed this project during the nights of the second week of September/2016,
 There are five selectable options of sprites, the original Apple II, the Commodore 64, IBM-DOS CGA, Atari 8 bits and Sinclair ZX Spectrum. The sound effects are from the Commodore 64 port.
 
 The player can also select from three different versions of the game (level sets): the Classic (150 levels), Championship (50 levels) and Professional (150 levels). 
-The level sets (and some assets) were converted from the [Javascript Lode Runner](https://github.com/SimonHung/LodeRunner_TotalRecall) project by Simon Hung.
+The level sets, guards AI and some assets were converted from the [Javascript Lode Runner](https://github.com/SimonHung/LodeRunner_TotalRecall) project by Simon Hung.
 
 If you have a Roku or Roku TV you can install the preview channel using this link: https://my.roku.com/add/LodeRunnerPreview
 
