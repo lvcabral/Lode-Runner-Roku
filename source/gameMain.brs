@@ -50,9 +50,10 @@ Sub Main()
                 m.runner.score = m.savedGame.score
                 m.runner.usedCheat = m.savedGame.usedCheat
             else
-                m.currentLevel = 1
+                m.currentLevel = m.settings.startLevel
                 m.levelSprites = invalid
                 ResetGame()
+                m.runner.usedCheat = (m.settings.startLevel > 1)
             end if
             'Open Game Screen
             PlayIntro(2000)
@@ -202,12 +203,17 @@ End Sub
 
 Function GetTheme() as object
     theme = {
-                BackgroundColor: "#000000",
-                OverhangSliceSD: "pkg:/images/overhang_sd.jpg",
-                OverhangSliceHD: "pkg:/images/overhang_hd.jpg",
-                ListScreenHeaderText: "#FFFFFF",
-                ListScreenDescriptionText: "#FFFFFF",
-                ListItemHighlightText: "#FFD801"
+            BackgroundColor: "#000000",
+            OverhangSliceSD: "pkg:/images/overhang_sd.jpg",
+            OverhangSliceHD: "pkg:/images/overhang_hd.jpg",
+            GridScreenOverhangSliceSD: "pkg:/images/overhang_sd.jpg",
+            GridScreenOverhangSliceHD: "pkg:/images/overhang_hd.jpg",
+            GridScreenBackgroundColor: "#000000",
+            GridScreenOverhangHeightSD: "90",
+            GridScreenOverhangHeightHD: "135",
+            ListScreenHeaderText: "#FFFFFF",
+            ListScreenDescriptionText: "#FFFFFF",
+            ListItemHighlightText: "#FFD801"
             }
     return theme
 End Function

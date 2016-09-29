@@ -12,7 +12,9 @@
 
 Function CreateLevel(levelSet as string, levelId as integer) as object
     this = {number: levelId, gold: 0, status: m.const.LEVEL_STARTUP}
-    this.animations = ParseJson(ReadAsciiFile("pkg:/assets/anims/hole.json"))
+    if m.holeAnimations = invalid
+        m.holeAnimations = ParseJson(ReadAsciiFile("pkg:/assets/anims/hole.json"))
+    end if
     this.redraw = true
     if m.maps = invalid or m.maps.name <> levelSet
         'Load json

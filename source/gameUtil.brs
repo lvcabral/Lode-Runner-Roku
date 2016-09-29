@@ -83,6 +83,10 @@ Function GetConstants() as object
     const.TILES_Z = 20
     const.CHARS_Z = 30
 
+    const.MESSAGEBOX_YES = 1
+    const.MESSAGEBOX_NO = 2
+    const.MESSAGEBOX_CANCEL = 3
+    
     return const
 End Function
 
@@ -280,6 +284,7 @@ Function LoadSettings() as dynamic
     if settings.controlMode = invalid then settings.controlMode = m.const.CONTROL_VERTICAL
     if settings.spriteMode = invalid then settings.spriteMode = m.const.SPRITES_AP2
     if settings.version = invalid then settings.version = m.const.VERSION_CLASSIC
+    if settings.startLevel = invalid then settings.startLevel = 1
     if settings.speed = invalid then settings.speed = m.const.SPEED_NORMAL
     return settings
 End Function

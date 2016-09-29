@@ -46,15 +46,26 @@ Function StartMenu() as integer
                 listIndex = msg.GetIndex()
             else if msg.isListItemSelected()
                 selection = msg.GetIndex()
-                if selection = 0 'Play game
+                if selection = m.const.MENU_START
                     SaveSettings(m.settings)
-                    res = 0
+                    res = m.const.MESSAGEBOX_YES
                     if m.savedGame <> invalid
                         res = MessageDialog("Lode Runner", "Do you want to continue unfinished game?", this.port)
-                        m.savedGame.restore = (res = 1)
+                        m.savedGame.restore = (res = m.const.MESSAGEBOX_YES)
                     end if
-                    if res < 3 then exit while
-                else if selection >= listItems.Count() - 2
+                    if res < m.const.MESSAGEBOX_CANCEL then exit while
+                else if selection = m.const.MENU_VERSION
+                    selected = SelectStartLevel(m.settings.spriteMode, m.settings.version, m.settings.startLevel, this.port)
+                    if selected > 0 and selected <> m.settings.startLevel
+                        m.settings.startLevel = selected
+                        listItems[selection].Title = "Version: " + this.versionModes[m.settings.version]
+                        listItems[selection].ShortDescriptionLine1 = this.versionHelp[m.settings.version] + Chr(10) + "Start Level: " + zeroPad(m.settings.startLevel, 3)
+                        imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, m.settings.startLevel)
+                        listItems[selection].HDPosterUrl = imgPath
+                        listItems[selection].SDPosterUrl = imgPath
+                        this.screen.SetItem(selection, listItems[selection])
+                    end if
+                else if selection >= m.const.MENU_HISCORES
                     exit while
                 end if
             else if msg.isRemoteKeyPressed()
@@ -74,23 +85,27 @@ Function StartMenu() as integer
                         listItems[listIndex].HDPosterUrl = this.spriteImage[m.settings.spriteMode]
                         listItems[listIndex].SDPosterUrl = this.spriteImage[m.settings.spriteMode]
                         this.screen.SetItem(listIndex, listItems[listIndex])
-                        listItems[listIndex + 1].HDPosterUrl = GetLevelMapImage(m.settings.spriteMode, m.settings.version, 1)
-                        listItems[listIndex + 1].SDPosterUrl = GetLevelMapImage(m.settings.spriteMode, m.settings.version, 1)
+                        imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, m.settings.startLevel)
+                        listItems[listIndex + 1].HDPosterUrl = imgPath
+                        listItems[listIndex + 1].SDPosterUrl = imgPath
                         this.screen.SetItem(listIndex + 1, listItems[listIndex + 1])
                     end if
                 else if listIndex = m.const.MENU_VERSION
                     if remoteKey = m.code.BUTTON_LEFT_PRESSED
                         m.settings.version--
                         if m.settings.version < 0 then m.settings.version = this.versionModes.Count() - 1
+                        m.settings.startLevel = 1
                     else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
                         m.settings.version++
                         if m.settings.version = this.versionModes.Count() then m.settings.version = 0
+                        m.settings.startLevel = 1
                     end if
                     if update
                         listItems[listIndex].Title = "Version: " + this.versionModes[m.settings.version]
-                        listItems[listIndex].ShortDescriptionLine1 = this.versionHelp[m.settings.version]
-                        listItems[listIndex].HDPosterUrl = GetLevelMapImage(m.settings.spriteMode, m.settings.version, 1)
-                        listItems[listIndex].SDPosterUrl = GetLevelMapImage(m.settings.spriteMode, m.settings.version, 1)
+                        listItems[listIndex].ShortDescriptionLine1 = this.versionHelp[m.settings.version] + Chr(10) + "Start Level: " + zeroPad(m.settings.startLevel, 3)
+                        imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, m.settings.startLevel)
+                        listItems[listIndex].HDPosterUrl = imgPath
+                        listItems[listIndex].SDPosterUrl = imgPath
                         this.screen.SetItem(listIndex, listItems[listIndex])
                     end if
                 else if listIndex = m.const.MENU_CONTROL
@@ -148,14 +163,15 @@ Function GetMenuItems(menu as object)
                 ShortDescriptionLine1: menu.spriteHelp[m.settings.spriteMode]
                 ShortDescriptionLine2: "Use Left and Right to select the skin"
                 })
+    img = GetLevelMapImage(m.settings.spriteMode, m.settings.version, m.settings.startLevel)
     listItems.Push({
                 Title: "Version: " + menu.versionModes[m.settings.version]
-                HDSmallIconUrl: "pkg:/images/icon_arrows.png"
-                SDSmallIconUrl: "pkg:/images/icon_arrows.png"
-                HDPosterUrl: GetLevelMapImage(m.settings.spriteMode, m.settings.version, 1)
-                SDPosterUrl: GetLevelMapImage(m.settings.spriteMode, m.settings.version, 1)
-                ShortDescriptionLine1: menu.versionHelp[m.settings.version]
-                ShortDescriptionLine2: "Use Left and Right to select a level set"
+                HDSmallIconUrl: "pkg:/images/icon_arrows_ok.png"
+                SDSmallIconUrl: "pkg:/images/icon_arrows_ok.png"
+                HDPosterUrl: img
+                SDPosterUrl: img
+                ShortDescriptionLine1: menu.versionHelp[m.settings.version] + Chr(10) + "Start Level: " + zeroPad(m.settings.startLevel, 3)
+                ShortDescriptionLine2: "Left & Right set version, OK set start level"
                 })
     listItems.Push({
                 Title: "Control: " + menu.controlModes[m.settings.controlMode]
@@ -181,7 +197,7 @@ Function GetMenuItems(menu as object)
                 SDSmallIconUrl: "pkg:/images/icon_hiscores.png"
                 HDPosterUrl: "pkg:/images/brick_logo.png"
                 SDPosterUrl: "pkg:/images/brick_logo.png"
-                ShortDescriptionLine1: ""
+                ShortDescriptionLine1: "Use of cheat keys or custom start level" + Chr(10) + "disables record for high score."
                 ShortDescriptionLine2: "Press OK to open High Scores"
                 })
     listItems.Push({
@@ -305,6 +321,78 @@ Sub ShowHighScores(waitTime = 0 as integer)
     end while
 End Sub
 
+Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId as integer, port as object) as integer
+    mapName = GetVersionMap(versionId)
+    screen = CreateObject("roGridScreen")
+    screen.SetMessagePort(port)
+    screen.SetBreadcrumbEnabled(false)
+    screen.SetGridStyle("flat-landscape")
+    screen.SetDisplayMode("scale-to-fit")
+    screen.ShowMessage("Loading " + mapName + " maps...")
+    'Load the content
+    if m.maps = invalid then m.level = CreateLevel(mapName, levelId)
+    if m.maps.levels.total > 100
+        screen.SetupLists(3)
+        screen.SetListNames(["Levels: 1 to 50", "Levels: 51 to 100", "Levels: 101 to " + itostr(m.maps.levels.total)])
+        content = [[],[],[]]
+    else if m.maps.levels.total > 50
+        screen.SetupLists(3)
+        screen.SetListNames(["Levels: 1 to 50", "Levels: 51 to " + itostr(m.maps.levels.total)])
+        content = [[],[]]
+    else
+        screen.SetupLists(1)
+        screen.SetListNames(["Levels: 1 to " + itostr(m.maps.levels.total)])
+        content = [[]]
+    end if
+    screen.Show()
+    screen.SetDescriptionVisible(false)
+    for r = 0 to content.Count() - 1
+        for l = 1 to 50
+            id = 50 * r + l
+            if l < 7 or l > 48
+                imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, id)
+                content[r].Push({id: id, SDPosterUrl: imgPath, HDPosterUrl: imgPath})
+            else
+                content[r].Push(invalid)
+            end if
+        next
+    next
+    for t = 0 to content.count()-1
+        screen.SetContentList(t, content[t])
+    end for
+    selected = -1
+    while true
+        msg = wait(0, screen.GetMessagePort())
+        if type(msg) = "roGridScreenEvent"
+            if msg.isScreenClosed()
+                exit while
+            else if msg.isListItemFocused()
+                row = msg.GetIndex()
+                rowList = content[msg.GetIndex()]
+                col = msg.GetData()
+                for x = -3 to 3
+                    idx = col + x
+                    if idx < 0 then idx += 49
+                    if idx > 49 then idx -= 49
+                    levelId = 50 * row + idx + 1
+                    if rowList[idx] = invalid
+                        imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, levelId)
+                        rowList[idx] = {id: levelId, SDPosterUrl: imgPath, HDPosterUrl: imgPath}
+                        screen.SetContentList(row, rowList)
+                    end if
+                next
+            else if msg.isListItemSelected()
+                row = msg.GetIndex()
+                rowList = content[msg.GetIndex()]
+                idx = msg.GetData()
+                selected = rowList[idx].id
+                exit while
+            end if
+        end if
+    end while
+    return selected
+End Function
+
 Function GetLevelMapImage(spriteMode as integer, versionId as integer, levelId as integer) as string
     LoadGameSprites(spriteMode)
     mapName = GetVersionMap(versionId)
@@ -328,6 +416,9 @@ Function GetLevelMapImage(spriteMode as integer, versionId as integer, levelId a
                 end if
             next
         next
+        reg = CreateObject("roFontRegistry")
+        font = reg.GetDefaultFont(30, true, false)
+        bmp.DrawText(zeroPad(levelId, 3), (m.gameWidth - 60) / 2, m.gameHeight - 32, m.colors.white, font)
         bmp.Finish()
         png = bmp.GetPng(0, 0, m.gameWidth, m.gameHeight)
         png.WriteFile(tmpFile)

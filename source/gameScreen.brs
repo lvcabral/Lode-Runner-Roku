@@ -281,7 +281,7 @@ Sub RedrawTiles()
             tile = m.level.map[tx][ty]
             if tile.bitmap <> invalid
                 if tile.hole
-                    actionArray = m.level.animations.sequence.Lookup(tile.bitmap)
+                    actionArray = m.holeAnimations.sequence.Lookup(tile.bitmap)
                     frameName = "hole_" + zeroPad(actionArray[tile.frame])
                     tile.frame++
                     if tile.frame = actionArray.Count()
