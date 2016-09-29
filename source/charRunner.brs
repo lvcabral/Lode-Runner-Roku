@@ -75,7 +75,7 @@ Sub update_runner()
         m.move(m.const.ACT_NONE)
     end if
     'Falling sound
-    if m.state = m.STATE_FALL
+    if m.state = m.STATE_FALL and m.level.status <> m.const.LEVEL_STARTUP
         if m.sounds.wav.clip <> "fall" or m.sounds.wav.cycles = 0
             PlaySound("fall")
         end if

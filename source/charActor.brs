@@ -52,10 +52,12 @@ Sub move_actor(action)
     'Update char position
     upTile = invalid
     downTile = invalid
+    downTile2 = invalid
     leftTile = invalid
     rightTile = invalid
     if m.blockY > 0 then upTile = m.level.map[m.blockX][m.blockY-1]
     if m.blockY < m.const.TILES_Y-1 then downTile = m.level.map[m.blockX][m.blockY+1]
+    if m.blockY < m.const.TILES_Y-2 then downTile2 = m.level.map[m.blockX][m.blockY + 2]
     if m.blockX > 0 then leftTile = m.level.map[m.blockX-1][m.blockY]
     if m.blockX < m.const.TILES_X-1 then rightTile = m.level.map[m.blockX+1][m.blockY]
     if m.state <> m.STATE_FALL or IsFloor(downTile) then m.state = m.STATE_STOP
@@ -104,8 +106,6 @@ Sub move_actor(action)
             end if
         end if
     else if action = m.const.ACT_DOWN and not IsBarrier(downTile)
-        downTile2 = invalid
-        if m.blockY < m.const.TILES_Y-2 then downTile2 = m.level.map[m.blockX][m.blockY + 2]
         if IsLadder(curTile, hladr) or IsLadder(downTile, hladr)
             if m.charAction <> "runUpDown"
                 m.charAction = "runUpDown"
@@ -183,6 +183,12 @@ Sub move_actor(action)
             m.state = m.STATE_MOVE
             m.offsetX += m.const.MOVE_X
             m.offsetY = 0
+        end if
+    else if not IsFloor(downTile) and not IsFloor(downTile2)
+        if not IsBar(curTile) and not IsLadder(curTile, hladr)
+            m.state = m.STATE_FALL
+            m.charAction = "fallLeft"
+            m.frame = 0
         end if
     end if
     'Update fall
