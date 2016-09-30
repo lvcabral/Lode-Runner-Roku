@@ -3,7 +3,7 @@ Remake of the classsic game Lode Runner (1983) for Roku streaming devices and TV
 
 ![Lode Runner for Roku](http://lvcabral.com/LodeRunner/images/splash_sd.jpg)
 
-I developed this project during the nights of the second week of September/2016, after finishing the port of 
+I developed this project during the nights and weekends of September/2016, after finishing the port of 
 [Prince of Persia for Roku](https://github.com/lvcabral/Prince-of-Persia-Roku) as part of my studies about BrightScript 2D gamming API.
 
 There are five selectable options of sprites, the original Apple II, the Commodore 64, IBM-DOS CGA, Atari 8 bits and Sinclair ZX Spectrum. The sound effects are from the Commodore 64 port.
