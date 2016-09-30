@@ -201,7 +201,8 @@ Sub RunnerUpdate()
             m.runner.sprite.MoveTo(x, y)
             'Check collision with guards
             if not m.immortal
-                if m.runner.sprite.CheckCollision() <> invalid
+                guardSprite = m.runner.sprite.CheckCollision()
+                if guardSprite <> invalid and guardSprite.GetY() <= m.runner.sprite.GetY()
                     m.runner.alive = false
                 end if
             end if
