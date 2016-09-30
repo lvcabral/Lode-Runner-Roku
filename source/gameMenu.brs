@@ -24,6 +24,8 @@ Function StartMenu() as integer
                          "pkg:/images/ibm_pc.png", "pkg:/images/atari_400.png",
                          "pkg:/images/zx_spectrum.png", "pkg:/images/randomize.png"]
     this.versionModes = ["Classic (1983)", "Championship (1984)", "Professional (1985)"]
+    this.startLevels  = [1, 1, 1]
+    this.startLevels[m.settings.version] = m.settings.startLevel
     this.versionHelp  = ["150 original levels", "50 difficult levels created by fans",
                          "150 new levels by Dodosoft"]
     this.controlModes = ["Vertical Mode", "Horizontal Mode"]
@@ -57,6 +59,7 @@ Function StartMenu() as integer
                 else if selection = m.const.MENU_VERSION
                     selected = SelectStartLevel(m.settings.spriteMode, m.settings.version, m.settings.startLevel, this.port)
                     if selected > 0 and selected <> m.settings.startLevel
+                        this.startLevels[m.settings.version] = selected
                         m.settings.startLevel = selected
                         listItems[selection].Title = "Version: " + this.versionModes[m.settings.version]
                         listItems[selection].ShortDescriptionLine1 = this.versionHelp[m.settings.version] + Chr(10) + "Start Level: " + zeroPad(m.settings.startLevel, 3)
@@ -94,11 +97,11 @@ Function StartMenu() as integer
                     if remoteKey = m.code.BUTTON_LEFT_PRESSED
                         m.settings.version--
                         if m.settings.version < 0 then m.settings.version = this.versionModes.Count() - 1
-                        m.settings.startLevel = 1
+                        m.settings.startLevel = this.startLevels[m.settings.version]
                     else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
                         m.settings.version++
                         if m.settings.version = this.versionModes.Count() then m.settings.version = 0
-                        m.settings.startLevel = 1
+                        m.settings.startLevel = this.startLevels[m.settings.version]
                     end if
                     if update
                         listItems[listIndex].Title = "Version: " + this.versionModes[m.settings.version]
@@ -330,7 +333,7 @@ Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId a
     screen.SetDisplayMode("scale-to-fit")
     screen.ShowMessage("Loading " + mapName + " maps...")
     'Load the content
-    if m.maps = invalid then m.level = CreateLevel(mapName, levelId)
+    m.level = CreateLevel(mapName, levelId)
     if m.maps.levels.total > 100
         screen.SetupLists(3)
         screen.SetListNames(["Levels: 1 to 50", "Levels: 51 to 100", "Levels: 101 to " + itostr(m.maps.levels.total)])
@@ -390,6 +393,7 @@ Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId a
             end if
         end if
     end while
+    m.level = invalid
     return selected
 End Function
 
