@@ -120,7 +120,7 @@ Sub update_guard(runnerPos as object)
             end if
         end if
         m.state = m.STATE_MOVE
-    else if m.originalAI
+    else if m.originalAI 'Original Game AI ported from Simon Hung JS version
         if m.state = m.STATE_FALL or m.level.status = m.const.LEVEL_STARTUP
             m.move(m.const.ACT_NONE)
         else
@@ -216,7 +216,11 @@ Function best_move_guard(runnerPos as object) as integer
 			else if m.blockX > runnerX
 				nextMove = m.const.ACT_LEFT
             else
-                nextMove = m.const.ACT_LEFT
+				if m.offsetX < runnerPos.offsetX
+					nextMove = m.const.ACT_RIGHT
+				else
+					nextMove = m.const.ACT_LEFT
+				end if
 			end if
 			return nextMove
 		end if

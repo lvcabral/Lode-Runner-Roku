@@ -232,7 +232,10 @@ Sub GuardsUpdate()
                 end if
             next
         end if
-        if not m.stopGuards then guard.update({x: m.runner.blockX, y: m.runner.blockY})
+        if not m.stopGuards
+			runnerPos = {x: m.runner.blockX, y: m.runner.blockY, offsetX: m.runner.offsetX}
+			guard.update(runnerPos)
+		end if
         gdRegion = m.regions.guard.Lookup(guard.frameName)
         if gdRegion <> invalid
             x = (guard.blockX * m.const.TILE_WIDTH) + guard.offsetX
@@ -310,6 +313,14 @@ Sub RedrawTiles()
                             tile.bitmap = "fillHole"
                         end if
                         tile.frame = 0
+					else if tile.bitmap <> "fillHole" and m.level.map[tx][ty - 1].guard
+						tile.bitmap = "brick"
+						tile.act = m.const.MAP_BLOCK
+						tile.hole = false
+						tile.guard = false
+                        frameName = "hole_19"
+						StopSound()
+						print "digging aborted"
                     end if
                     tileRegion = m.regions.hole.Lookup(frameName)
                     if tileRegion <> invalid

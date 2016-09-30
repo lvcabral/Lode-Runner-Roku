@@ -21,7 +21,7 @@
     {
         "type":"wav",
         "duration":550,
-        "priority":10
+        "priority":20
     },
     "pass":
     {
