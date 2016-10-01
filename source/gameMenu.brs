@@ -9,7 +9,7 @@
 ' ********************************************************************************************************
 ' ********************************************************************************************************
 
-Function StartMenu() as integer
+Function StartMenu(focus as integer) as integer
     this = {
             screen: CreateObject("roListScreen")
             port: CreateObject("roMessagePort")
@@ -23,11 +23,11 @@ Function StartMenu() as integer
     this.spriteImage  = ["pkg:/images/apple_ii.png", "pkg:/images/commodore_64.png",
                          "pkg:/images/ibm_pc.png", "pkg:/images/atari_400.png",
                          "pkg:/images/zx_spectrum.png", "pkg:/images/randomize.png"]
-    this.versionModes = ["Classic (1983)", "Championship (1984)", "Professional (1985)"]
-    this.startLevels  = [1, 1, 1]
+    this.versionModes = ["Classic (1983)", "Championship (1984)", "Professional (1985)", "Custom Levels"]
+    this.startLevels  = [1, 1, 1, 1]
     this.startLevels[m.settings.version] = m.settings.startLevel
     this.versionHelp  = ["150 original levels", "50 difficult levels created by fans",
-                         "150 new levels by Dodosoft"]
+                         "150 new levels by Dodosoft", "Edit your own custom levels"]
     this.controlModes = ["Vertical Mode", "Horizontal Mode"]
     this.controlHelp  = ["", ""]
     this.controlImage = ["pkg:/images/control_vertical.png", "pkg:/images/control_horizontal.png"]
@@ -35,6 +35,7 @@ Function StartMenu() as integer
     this.speedHelp    = ["VERY SLOW", "SLOW", "NORMAL", "FAST", "VERY FAST"]
     listItems = GetMenuItems(this)
     this.screen.SetContent(listItems)
+    this.screen.SetFocusedListItem(focus)
     this.screen.Show()
     startGame = false
     listIndex = 0
@@ -58,7 +59,10 @@ Function StartMenu() as integer
                     if res < m.const.MESSAGEBOX_CANCEL then exit while
                 else if selection = m.const.MENU_VERSION
                     selected = SelectStartLevel(m.settings.spriteMode, m.settings.version, m.settings.startLevel, this.port)
-                    if selected > 0 and selected <> m.settings.startLevel
+                    if selected > 0 and m.settings.version = m.const.VERSION_CUSTOM
+                        m.settings.startLevel = selected
+                        exit while
+                    else if selected > 0 and selected <> m.settings.startLevel
                         this.startLevels[m.settings.version] = selected
                         m.settings.startLevel = selected
                         listItems[selection].Title = "Version: " + this.versionModes[m.settings.version]
@@ -74,7 +78,11 @@ Function StartMenu() as integer
             else if msg.isRemoteKeyPressed()
                 remoteKey = msg.GetIndex()
                 update = (remoteKey = m.code.BUTTON_LEFT_PRESSED or remoteKey = m.code.BUTTON_RIGHT_PRESSED)
-                if listIndex = m.const.MENU_GRAPHICS
+                if remoteKey = m.code.BUTTON_REWIND_PRESSED
+                    this.screen.SetFocusedListItem(m.const.MENU_START)
+                else if remoteKey = m.code.BUTTON_FAST_FORWARD_PRESSED
+                    this.screen.SetFocusedListItem(m.const.MENU_CREDITS)
+                else if listIndex = m.const.MENU_GRAPHICS
                     if remoteKey = m.code.BUTTON_LEFT_PRESSED
                         m.settings.spriteMode--
                         if m.settings.spriteMode < 0 then m.settings.spriteMode = this.spriteModes.Count() - 1
@@ -174,7 +182,7 @@ Function GetMenuItems(menu as object)
                 HDPosterUrl: img
                 SDPosterUrl: img
                 ShortDescriptionLine1: menu.versionHelp[m.settings.version] + Chr(10) + "Start Level: " + zeroPad(m.settings.startLevel, 3)
-                ShortDescriptionLine2: "Left & Right set version, OK set start level"
+                ShortDescriptionLine2: "Left & Right set version, OK to select level"
                 })
     listItems.Push({
                 Title: "Control: " + menu.controlModes[m.settings.controlMode]
@@ -276,6 +284,11 @@ Function CheckHighScores() as boolean
 End Function
 
 Sub ShowHighScores(waitTime = 0 as integer)
+    if m.settings.version < m.const.VERSION_CUSTOM
+        version = m.settings.version
+    else
+        version = m.const.VERSION_CLASSIC
+    end if
     if m.regions = invalid then LoadGameSprites(m.settings.spriteMode)
     screen = m.mainScreen
     Sleep(250) ' Give time to Roku clear list screen from memory
@@ -290,7 +303,7 @@ Sub ShowHighScores(waitTime = 0 as integer)
     lineSpacing = (m.const.TILE_HEIGHT + 10)
     x = border
     y = m.const.TILE_HEIGHT
-    WriteText(bmp, padCenter(GetVersionMap(m.settings.version) + " LODE RUNNER", columns), x, y)
+    WriteText(bmp, padCenter(GetVersionMap(version) + " LODE RUNNER", columns), x, y)
     y += lineSpacing
     WriteText(bmp, padCenter("HIGH SCORES", columns), x, y)
     y += lineSpacing
@@ -301,7 +314,7 @@ Sub ShowHighScores(waitTime = 0 as integer)
         bmp.DrawObject(x + i * m.const.TILE_WIDTH, y, ground)
     next
     y += (m.const.GROUND_HEIGHT + 7)
-    scores = m.highScores[m.settings.version]
+    scores = m.highScores[version]
     for h = 1 to 10
         x = WriteText(bmp, zeroPad(h) + ". ", x, y)
         if h <= scores.Count()
@@ -349,27 +362,35 @@ Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId a
     end if
     screen.Show()
     screen.SetDescriptionVisible(false)
-    for r = 0 to content.Count() - 1
-        for l = 1 to 50
-            id = 50 * r + l
-            if l < 7 or l > 48
-                imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, id)
-                content[r].Push({id: id, SDPosterUrl: imgPath, HDPosterUrl: imgPath})
-            else
-                content[r].Push(invalid)
-            end if
+    if m.settings.version < m.const.VERSION_CUSTOM
+        for r = 0 to content.Count() - 1
+            for l = 1 to 50
+                id = 50 * r + l
+                if l < 7 or l > 48
+                    imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, id)
+                    content[r].Push({id: id, SDPosterUrl: imgPath, HDPosterUrl: imgPath})
+                else
+                    content[r].Push(invalid)
+                end if
+            next
         next
-    next
+    else
+        for l = 1 to 5
+            imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, l)
+            content[0].Push({id: l, SDPosterUrl: imgPath, HDPosterUrl: imgPath})
+        next
+    end if
     for t = 0 to content.count()-1
         screen.SetContentList(t, content[t])
     end for
+    screen.SetFocusedListItem(0, 0)
     selected = -1
     while true
         msg = wait(0, screen.GetMessagePort())
         if type(msg) = "roGridScreenEvent"
             if msg.isScreenClosed()
                 exit while
-            else if msg.isListItemFocused()
+            else if msg.isListItemFocused() and m.settings.version < m.const.VERSION_CUSTOM
                 row = msg.GetIndex()
                 rowList = content[msg.GetIndex()]
                 col = msg.GetData()
@@ -401,7 +422,7 @@ Function GetLevelMapImage(spriteMode as integer, versionId as integer, levelId a
     LoadGameSprites(spriteMode)
     mapName = GetVersionMap(versionId)
     tmpFile = "tmp:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + ".png"
-    if not m.files.Exists(tmpFile)
+    if not m.files.Exists(tmpFile) or versionId = m.const.VERSION_CUSTOM
         'Load level map
         level = CreateLevel(mapName, levelId)
         'Canvas Bitmaps

@@ -27,12 +27,13 @@ Function PlayGame() as boolean
     m.speed = m.gameSpeeds[m.settings.speed]
     m.gameOver = false
     'Game Loop
+    id = -1
     m.clock.Mark()
     while true
         event = m.port.GetMessage()
-        if type(event) = "roUniversalControlEvent"
+        if type(event) = "roUniversalControlEvent" or id > 0
             'Handle Remote Control events
-            id = event.GetInt()
+            if id < 0 then id = event.GetInt()
             if id = m.code.BUTTON_BACK_PRESSED
                 StopAudio()
                 DestroyChars()
@@ -55,6 +56,7 @@ Function PlayGame() as boolean
             else
                 m.runner.cursors.update(id, false)
             end if
+            id = -1
         else if event = invalid
             'Game screen process
             ticks = m.clock.TotalMilliseconds()
@@ -65,25 +67,29 @@ Function PlayGame() as boolean
                 GuardsUpdate()
                 SoundUpdate()
                 'Paint Screen
-                if m.level.status = m.const.LEVEL_STARTUP then LevelStartup()
+                if m.level.status = m.const.LEVEL_STARTUP and not m.gameOver
+                    id = LevelStartup()
+                end if
                 m.compositor.AnimationTick(ticks)
                 m.compositor.DrawAll()
                 DrawStatusBar()
                 m.mainScreen.SwapBuffers()
                 m.clock.Mark()
                 'Check runner death
-                if not m.runner.alive
-                    PlaySound("dead")
-                    Sleep(800)
-                    m.runner.health--
-                    if m.runner.health > 0
-                        ResetGame()
-                        SaveGame()
+                if not m.gameOver
+                    if not m.runner.alive
+                        PlaySound("dead")
+                        Sleep(800)
+                        m.runner.health--
+                        if m.runner.health > 0
+                            ResetGame()
+                            SaveGame()
+                        else
+                            m.gameOver = true
+                        end if
                     else
-                        m.gameOver = true
+                        m.gameOver = CheckLevelSuccess()
                     end if
-                else
-                    m.gameOver = CheckLevelSuccess()
                 end if
                 if m.gameOver
                     GameOver()
@@ -98,9 +104,9 @@ Function PlayGame() as boolean
     return false
 End Function
 
-Sub LevelStartup()
+Function LevelStartup() as integer
     if m.isOpenGL
-        for i = 0 to 255 step 2
+        for i = 0 to 255 step 5
             hexcolor = &hFF - i
             width = m.gameScreen.GetWidth()
             height = m.gameScreen.GetHeight() - 32
@@ -127,7 +133,8 @@ Sub LevelStartup()
 	end while
     m.runner.sprite.SetDrawableFlag(true)
     m.level.status = m.const.LEVEL_PLAYING
-End Sub
+    return key
+End Function
 
 Function CheckLevelSuccess() as boolean
     finish = false
@@ -144,7 +151,7 @@ Function CheckLevelSuccess() as boolean
         if m.currentLevel < m.maps.levels.total
             if m.runner.health < m.const.LIMIT_HEALTH then m.runner.health++
             NextLevel()
-            SaveGame()
+            if m.gameOver then finish = true else SaveGame()
         else
             finish = true
         end if

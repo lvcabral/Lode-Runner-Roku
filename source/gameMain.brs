@@ -29,16 +29,18 @@ Sub Main()
     m.settings = LoadSettings()
     m.savedGame = LoadSavedGame()
     m.highScores = LoadHighScores()
+    m.custom = LoadCustomLevels()
     'Debug switches
     m.stopGuards = false ' flag to enable/disable guards
     m.immortal = false 'flag to enable/disable runner immortality
     m.isOpenGL = isOpenGL()
+    selection = m.const.MENU_START
     'Main Menu Loop
     while true
         'Configure screen/game areas based on the configuration
         SetupGameScreen()
         print "Starting menu..."
-        selection = StartMenu()
+        selection = StartMenu(selection)
         if selection = m.const.MENU_START
             print "Starting game..."
             if m.savedGame <> invalid and m.savedGame.restore
@@ -46,18 +48,30 @@ Sub Main()
                 m.currentLevel = m.savedGame.level
                 m.levelSprites = invalid
                 ResetGame()
-                m.runner.health = m.savedGame.health
-                m.runner.score = m.savedGame.score
-                m.runner.usedCheat = m.savedGame.usedCheat
+                if m.level.runner <> invalid
+                    m.runner.health = m.savedGame.health
+                    m.runner.score = m.savedGame.score
+                    m.runner.usedCheat = m.savedGame.usedCheat
+                end if
             else
                 m.currentLevel = m.settings.startLevel
                 m.levelSprites = invalid
                 ResetGame()
-                m.runner.usedCheat = (m.settings.startLevel > 1)
+                if m.level.runner <> invalid
+                    m.runner.usedCheat = (m.settings.startLevel > 1 or m.settings.version = m.const.VERSION_CUSTOM)
+                end if
             end if
-            'Open Game Screen
-            PlayIntro(2000)
-            if PlayGame() then ShowHighScores(5000)
+            if m.level.runner <> invalid
+                'Open Game Screen
+                PlayIntro(2000)
+                if PlayGame() then ShowHighScores(5000)
+            else
+                res = MessageDialog("Lode Runner", "Custom level has no runner!", invalid, 1)
+            end if
+        else if selection = m.const.MENU_VERSION
+            EditCustomLevel(m.settings.startLevel)
+            m.settings.startLevel = 1
+            SaveCustomLevels(m.custom)
         else if selection = m.const.MENU_CREDITS
             ShowCredits()
         else if selection = m.const.MENU_HISCORES
@@ -68,6 +82,7 @@ End Sub
 
 Sub PlayIntro(waitTime as integer)
     screen = m.mainScreen
+    Sleep(250) ' Give time to Roku clear list screen from memory
     if m.isOpenGL
         screen.Clear(m.colors.black)
         screen.SwapBuffers()
@@ -86,6 +101,7 @@ Sub PlayIntro(waitTime as integer)
     screen.SwapBuffers()
 	while true
     	key = wait(waitTime, m.port)
+        print "intro"
 		if key = invalid or key < 100 then exit while
 	end while
 End Sub
@@ -109,7 +125,7 @@ Sub ResetGame()
     print "Reseting Level "; itostr(g.currentLevel)
     if g.level <> invalid
         DestroyStage()
-        if g.guards.Count() > 0
+        if g.guards <> invalid and g.guards.Count() > 0
             for each guard in g.guards
                 if guard.sprite <> invalid
                     guard.sprite.Remove()
@@ -124,6 +140,11 @@ Sub ResetGame()
         end if
     end if
     g.level = CreateLevel(GetVersionMap(g.settings.version), g.currentLevel)
+    if g.level.runner = invalid
+        g.runner.alive = false
+        g.gameOver = true
+        return
+    end if
     if g.settings.spriteMode < g.const.SPRITES_RND
         LoadGameSprites(g.settings.spriteMode)
     else
