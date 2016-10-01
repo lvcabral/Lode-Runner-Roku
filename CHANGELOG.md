@@ -1,3 +1,16 @@
+#####v0.11 - Start Level Selection and Dynamic Map Thumbnails
+* Add: Custom Level Editor #28
+* Change: The button pressed to start level shall start executing the action relative to it #29
+* Change: Keys REW and FF should move the menu to first and last items #30
+
+#####v0.10 - 30-Sep-2016 - Start Level Selection and Dynamic Map Thumbnails
+* Add: Option to select Start Level
+* Fix: Runner is not falling when starts the level with no floor below him (L150) #19
+* Fix: Two Guards got stuck in the wall at the top left in Level 6 after rebirth #21
+* Fix: Dig should not be possible if guard is too close #14 (reopened)
+* Fix: Sometimes a guard get stuck in front of the runner without killing him #17
+* Fix: Runner is dying when walking over the guards #27
+
 #####v0.9 - 26-Sep-2016 - Save Game and High Scores
 * Add: Save game status and option to restore at the start #3
 * Add: Save and display High Scores for each version #2
