@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: September 2016
+' **  Updated: October 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -216,6 +216,7 @@ Sub ResetScreen(mainWidth as integer, mainHeight as integer, gameWidth as intege
     yOff = Cint((mainHeight-gameHeight) / 2)
     drwRegions = dfSetupDisplayRegions(g.mainScreen, xOff, yOff, gameWidth, gameHeight)
     g.gameScreen = drwRegions.main
+    g.gameTop = drwRegions.upper
     g.gameBottom = drwRegions.lower
     g.gameScreen.SetAlphaEnable(true)
     g.compositor = CreateObject("roCompositor")

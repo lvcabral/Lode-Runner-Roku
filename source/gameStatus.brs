@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: September 2016
+' **  Updated: October 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -86,7 +86,14 @@ Function WriteText(canvas as object, text as string, x as integer, y as integer)
         if ci = 32 then char = "space"
         letter = m.regions.text.Lookup(char)
         if letter = invalid then letter = m.regions.text.Lookup("space")
-        canvas.DrawObject(x, y, letter)
+        if m.isOpenGL
+            canvas.DrawObject(x, y, letter)
+        else
+            bmp = CreateObject("roBitmap", {width:letter.GetWidth(), height:letter.GetHeight(), alphaenable:true})
+            bmp.Clear(m.colors.black)
+            bmp.DrawObject(0, 0, letter)
+            canvas.DrawObject(x, y, bmp)
+        end if
         x += letter.GetWidth()
     next
     return x

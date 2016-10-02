@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: September 2016
+' **  Updated: October 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -11,10 +11,8 @@
 
 Sub EditCustomLevel(levelId as integer)
     Sleep(250) ' Give time to Roku clear list screen from memory
-    if m.isOpenGL
-        m.mainScreen.Clear(m.colors.black)
-        m.mainScreen.SwapBuffers()
-    end if
+    m.mainScreen.Clear(m.colors.black)
+    m.mainScreen.SwapBuffers()
     map = m.custom.levels.Lookup("level-" + zeroPad(levelId, 3))
     this = {number: levelId, gold: 0, repeat: false, const: m.const, loadMap: load_map, saveMap: save_map}
     this.bitmaps = ["", "brick", "solid", "ladder", "rope", "trap", "hladder", "gold"]
@@ -25,7 +23,7 @@ Sub EditCustomLevel(levelId as integer)
     showHelp = true
     showSaved = false
     while true
-        m.mainScreen.Clear(&hFF)
+        m.mainScreen.Clear(m.colors.black)
         DrawCustomLevel(this, blockX, blockY)
         DrawCanvasGrid(blockX, blockY)
         if showHelp
@@ -90,13 +88,16 @@ Sub EditCustomLevel(levelId as integer)
 End Sub
 
 Sub DrawCustomLevel(level as object, blockX, blockY)
+    if not m.isOpenGL
+        Sleep(250) ' Give time to Roku clear list screen from memory
+        m.mainScreen.Clear(m.colors.black)
+    end if
     LoadGameSprites(m.settings.spriteMode)
     bmp = CreateObject("roBitmap", {width:m.gameWidth, height:m.gameHeight, alphaenable:true})
     'Draw Title'
-    x = 20
+    x = 0
     y = m.const.TILE_HEIGHT
-    columns = m.mainScreen.GetWidth() / m.const.TILE_WIDTH
-    WriteText(m.mainScreen, padCenter("CUSTOM LEVEL EDITOR", columns), x, y)
+    WriteText(m.gameTop, padCenter("CUSTOM LEVEL EDITOR", m.const.TILES_X), x, y)
     'Draw level
     level.guards = []
     for ty = m.const.TILES_Y-1 to 0 step -1
@@ -163,7 +164,7 @@ Sub DrawCustomLevel(level as object, blockX, blockY)
     x = m.const.TILE_WIDTH * 19
     WriteText(m.gameScreen, "LEVEL " + zeroPad(level.number, 3), x, y)
     if level.repeat
-        WriteText(m.gameBottom, padCenter("REPEAT ON", 28), 0, 0)
+        WriteText(m.gameBottom, padCenter("REPEAT ON", m.const.TILES_X), 0, 0)
     end if
 End Sub
 
@@ -192,7 +193,7 @@ Function save_map() as object
     for y = 0 to m.const.TILES_Y - 1
         line = ""
         for x = 0 to m.const.TILES_X - 1
-            if x = m.runner.x and y = m.runner.y
+            if m.runner <> invalid and x = m.runner.x and y = m.runner.y
                 line += "&" 'Player
             else if m.map[x][y].guard
                 line += "0" 'Guard
