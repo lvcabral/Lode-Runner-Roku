@@ -17,7 +17,7 @@ The version 0.11 introduced a Customel Level Editor, so the user can created up 
 
 Click the image below to watch a video with the functionality up to version 0.11:
 
-[![Lode Runner for Remake for Roku (v0.11)](https://i.ytimg.com/vi/PizGMcdjIqQ/hqdefault.jpg)](https://www.youtube.com/watch?v=PizGMcdjIqQ)
+[![Lode Runner for Remake for Roku (v0.11)](http://lvcabral.com/LodeRunner/images/LodeRunnerYoutubeVideo011.png)](https://www.youtube.com/watch?v=PizGMcdjIqQ)
 
 Disclaimer: This source code shall not be used commercially or sold in any form, the objective of this project is educational.
 
