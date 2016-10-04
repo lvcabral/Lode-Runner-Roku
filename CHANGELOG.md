@@ -2,7 +2,6 @@
 * Add: Allow test level inside the editor #34
 * Change: Game remote key does not repeat on level editor #35
 * Fix: Level editor has poor performance on low end devices #33
-* Fix: Allow test level inside the editor #34
 * Fix: The image thumbnails are painting the hidden ladders #36
 
 #####v0.11 - Start Level Selection and Dynamic Map Thumbnails
