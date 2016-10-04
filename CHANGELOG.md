@@ -1,10 +1,10 @@
-#####v0.12 - Test Custom Level
+#####v0.12 - 03-Oct-2016 - Test Custom Level inside Editor
 * Add: Allow test level inside the editor #34
 * Change: Game remote key does not repeat on level editor #35
 * Fix: Level editor has poor performance on low end devices #33
 * Fix: The image thumbnails are painting the hidden ladders #36
 
-#####v0.11 - Start Level Selection and Dynamic Map Thumbnails
+#####v0.11 - 01-Oct-2016 - Start Level Selection and Dynamic Map Thumbnails
 * Add: Custom Level Editor #28
 * Change: The button pressed to start level shall start executing the action relative to it #29
 * Change: Keys REW and FF should move the menu to first and last items #30
