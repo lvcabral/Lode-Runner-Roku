@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: September 2016
+' **  Updated: October 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -437,3 +437,111 @@ Function padLeft(text as string, size as integer) as string
     end if
     return text
 End Function
+
+'------- Remote Control Functions -------
+
+Function GetControl(controlMode as integer) as object
+    this = {
+            code: bslUniversalControlEventCodes()
+            up: false
+            down: false
+            left: false
+            right: false
+            dig: false
+            digLeft: false
+            digRight: false
+           }
+    if controlMode = m.const.CONTROL_VERTICAL
+        this.update = update_control_vertical
+    else
+        this.update = update_control_horizontal
+    end if
+    this.reset = reset_control
+    return this
+End Function
+
+Sub update_control_vertical(id as integer)
+    if id = m.code.BUTTON_UP_PRESSED
+        m.up = true
+        m.down = false
+    else if id = m.code.BUTTON_DOWN_PRESSED
+        m.up = false
+        m.down = true
+    else if id = m.code.BUTTON_LEFT_PRESSED
+        m.left = true
+        m.right = false
+    else if id = m.code.BUTTON_RIGHT_PRESSED
+        m.left = false
+        m.right = true
+    else if id = m.code.BUTTON_SELECT_PRESSED
+        m.dig = true
+    else if id = m.code.BUTTON_REWIND_PRESSED
+        m.digLeft = true
+        m.dig = true
+    else if id = m.code.BUTTON_FAST_FORWARD_PRESSED
+        m.digRight = true
+        m.dig = true
+    else if id = m.code.BUTTON_UP_RELEASED
+        m.up = false
+    else if id = m.code.BUTTON_DOWN_RELEASED
+        m.down = false
+    else if id = m.code.BUTTON_LEFT_RELEASED
+        m.left = false
+    else if id = m.code.BUTTON_RIGHT_RELEASED
+        m.right = false
+    else if id = m.code.BUTTON_SELECT_RELEASED
+        m.dig = false
+    else if id = m.code.BUTTON_REWIND_RELEASED
+        m.digLeft = false
+        m.dig = false
+    else if id = m.code.BUTTON_FAST_FORWARD_RELEASED
+        m.digRight = false
+        m.dig = false
+    end if
+End Sub
+
+Sub update_control_horizontal(id as integer)
+    if id = m.code.BUTTON_RIGHT_PRESSED
+        m.up = true
+    else if id = m.code.BUTTON_LEFT_PRESSED
+        m.down = true
+    else if id = m.code.BUTTON_UP_PRESSED
+        m.left = true
+    else if id = m.code.BUTTON_DOWN_PRESSED
+        m.right = true
+    else if id = m.code.BUTTON_SELECT_PRESSED
+        m.dig = true
+    else if id = m.code.BUTTON_A_PRESSED
+        m.digLeft = true
+        m.dig = true
+    else if id = m.code.BUTTON_B_PRESSED
+        m.digRight = true
+        m.dig = true
+    else if id = m.code.BUTTON_RIGHT_RELEASED
+        m.up = false
+    else if id = m.code.BUTTON_LEFT_RELEASED
+        m.down = false
+    else if id = m.code.BUTTON_UP_RELEASED
+        m.left = false
+    else if id = m.code.BUTTON_DOWN_RELEASED
+        m.right = false
+    else if id = m.code.BUTTON_SELECT_RELEASED
+        m.dig = false
+    else if id = m.code.BUTTON_A_RELEASED
+        m.digLeft = false
+        m.dig = false
+    else if id = m.code.BUTTON_B_RELEASED
+        m.digRight = false
+        m.dig = false
+    end if
+End Sub
+
+Sub reset_control()
+    m.up = false
+    m.down = false
+    m.left = false
+    m.right = false
+    m.dig = false
+    m.digLeft = false
+    m.digRight = false
+End Sub

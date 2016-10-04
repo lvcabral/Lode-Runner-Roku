@@ -3,20 +3,17 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: September 2016
+' **  Updated: October 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
 ' ********************************************************************************************************
 
-Function PlayGame() as boolean
+Function PlayGame(testMode = false as boolean) as boolean
     'Clear screen (needed for non-OpenGL devices)
     m.mainScreen.Clear(0)
     m.mainScreen.SwapBuffers()
     m.mainScreen.Clear(0)
-    'Set offsets
-    m.canvasX = Cint((m.mainWidth - m.gameWidth) / 2)
-    m.canvasY = Cint((m.mainHeight - m.gameHeight) / 2)
     'Initialize flags and aux variables
     m.guardsMoves = [[0, 0, 0], [0, 1, 1], [1, 1, 1], [1, 2, 1], [1, 2, 2], [2, 2, 2], [2, 2, 3]]
     if m.isOpenGL
@@ -37,6 +34,7 @@ Function PlayGame() as boolean
             if id = m.code.BUTTON_BACK_PRESSED
                 StopAudio()
                 DestroyChars()
+                DestroyStage()
                 exit while
             else if id = m.code.BUTTON_INSTANT_REPLAY_PRESSED
                 m.runner.alive = false
@@ -47,14 +45,14 @@ Function PlayGame() as boolean
                     m.runner.health++
                     m.runner.usedCheat = true
                 end if
-            else if ControlNextLevel(id)
+            else if ControlNextLevel(id) and not testMode
                 NextLevel()
                 m.runner.usedCheat = true
-            else if ControlPreviousLevel(id)
+            else if ControlPreviousLevel(id) and not testMode
                 PreviousLevel()
                 m.runner.usedCheat = true
             else
-                m.runner.cursors.update(id, false)
+                m.runner.cursors.update(id)
             end if
             id = -1
         else if event = invalid
@@ -87,15 +85,21 @@ Function PlayGame() as boolean
                         else
                             m.gameOver = true
                         end if
+                    else if testMode
+                        m.gameOver = m.runner.success
                     else
                         m.gameOver = CheckLevelSuccess()
                     end if
                 end if
                 if m.gameOver
-                    GameOver()
+                    changed = false
                     StopAudio()
-                    changed = CheckHighScores()
+                    if not testMode
+                        GameOver()
+                        changed = CheckHighScores()
+                    end if
                     DestroyChars()
+                    DestroyStage()
                     return changed
                 end if
             end if

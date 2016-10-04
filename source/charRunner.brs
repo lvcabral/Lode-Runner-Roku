@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: September 2016
+' **  Updated: October 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -14,7 +14,7 @@ Function CreateRunner(level as object) as object
     'Constants
     this.const = m.const
 	'Controller
-	this.cursors = GetCursors(m.settings.controlMode)
+	this.cursors = GetControl(m.settings.controlMode)
     this.sounds = m.sounds
     'Properties
     this.charType = "runner"
@@ -118,112 +118,6 @@ Function can_dig() as boolean
     end if
     return rsp
 End Function
-
-Function GetCursors(controlMode as integer) as object
-    this = {
-            code: bslUniversalControlEventCodes()
-            up: false
-            down: false
-            left: false
-            right: false
-            dig: false
-            digLeft: false
-            digRight: false
-           }
-    if controlMode = m.const.CONTROL_VERTICAL
-        this.update = update_cursor_vertical
-    else
-        this.update = update_cursor_horizontal
-    end if
-    this.reset = reset_cursors
-    return this
-End Function
-
-Sub update_cursor_vertical(id as integer, shiftToggle as boolean)
-    if id = m.code.BUTTON_UP_PRESSED
-        m.up = true
-        m.down = false
-    else if id = m.code.BUTTON_DOWN_PRESSED
-        m.up = false
-        m.down = true
-    else if id = m.code.BUTTON_LEFT_PRESSED
-        m.left = true
-        m.right = false
-    else if id = m.code.BUTTON_RIGHT_PRESSED
-        m.left = false
-        m.right = true
-    else if id = m.code.BUTTON_SELECT_PRESSED
-        m.dig = true
-    else if id = m.code.BUTTON_REWIND_PRESSED
-        m.digLeft = true
-        m.dig = true
-    else if id = m.code.BUTTON_FAST_FORWARD_PRESSED
-        m.digRight = true
-        m.dig = true
-    else if id = m.code.BUTTON_UP_RELEASED
-        m.up = false
-    else if id = m.code.BUTTON_DOWN_RELEASED
-        m.down = false
-    else if id = m.code.BUTTON_LEFT_RELEASED
-        m.left = false
-    else if id = m.code.BUTTON_RIGHT_RELEASED
-        m.right = false
-    else if id = m.code.BUTTON_SELECT_RELEASED
-        m.dig = false
-    else if id = m.code.BUTTON_REWIND_RELEASED
-        m.digLeft = false
-        m.dig = false
-    else if id = m.code.BUTTON_FAST_FORWARD_RELEASED
-        m.digRight = false
-        m.dig = false
-    end if
-End Sub
-
-Sub update_cursor_horizontal(id as integer, shiftToggle as boolean)
-    if id = m.code.BUTTON_RIGHT_PRESSED
-        m.up = true
-    else if id = m.code.BUTTON_LEFT_PRESSED
-        m.down = true
-    else if id = m.code.BUTTON_UP_PRESSED
-        m.left = true
-    else if id = m.code.BUTTON_DOWN_PRESSED
-        m.right = true
-    else if id = m.code.BUTTON_SELECT_PRESSED
-        m.dig = true
-    else if id = m.code.BUTTON_A_PRESSED
-        m.digLeft = true
-        m.dig = true
-    else if id = m.code.BUTTON_B_PRESSED
-        m.digRight = true
-        m.dig = true
-    else if id = m.code.BUTTON_RIGHT_RELEASED
-        m.up = false
-    else if id = m.code.BUTTON_LEFT_RELEASED
-        m.down = false
-    else if id = m.code.BUTTON_UP_RELEASED
-        m.left = false
-    else if id = m.code.BUTTON_DOWN_RELEASED
-        m.right = false
-    else if id = m.code.BUTTON_SELECT_RELEASED
-        m.dig = false
-    else if id = m.code.BUTTON_A_RELEASED
-        m.digLeft = false
-        m.dig = false
-    else if id = m.code.BUTTON_B_RELEASED
-        m.digRight = false
-        m.dig = false
-    end if
-End Sub
-
-Sub reset_cursors()
-    m.up = false
-    m.down = false
-    m.left = false
-    m.right = false
-    m.dig = false
-    m.digLeft = false
-    m.digRight = false
-End Sub
 
 Function key_u() as boolean
     return m.cursors.up

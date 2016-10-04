@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: September 2016
+' **  Updated: October 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -58,7 +58,11 @@ Function StartMenu(focus as integer) as integer
                     end if
                     if res < m.const.MESSAGEBOX_CANCEL then exit while
                 else if selection = m.const.MENU_VERSION
+                    background = CreateObject("roImageCanvas")
+                    background.Show()
                     selected = SelectStartLevel(m.settings.spriteMode, m.settings.version, m.settings.startLevel, this.port)
+                    background.Close()
+                    background = invalid
                     if selected > 0 and m.settings.version = m.const.VERSION_CUSTOM
                         m.settings.startLevel = selected
                         exit while
@@ -431,7 +435,7 @@ Function GetLevelMapImage(spriteMode as integer, versionId as integer, levelId a
         for ty = m.const.TILES_Y-1 to 0 step -1
             for tx = m.const.TILES_X-1 to 0 step -1
                 tile = level.map[tx][ty]
-                if tile.bitmap <> invalid
+                if tile.bitmap <> invalid and tile.base <> m.const.MAP_HLADR
                     tileRegion = m.regions.tiles.Lookup(tile.bitmap)
                     if tileRegion <> invalid
                         x = tx * m.const.TILE_WIDTH
