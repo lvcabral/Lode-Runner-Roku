@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: October 2016
+' **  Updated: November 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -164,6 +164,7 @@ Sub ResetGame()
     next
     g.nextGuard = 0
     g.nextMoves = 0
+    g.statusRedraw = true
     StopAudio()
     StopSound()
 End Sub

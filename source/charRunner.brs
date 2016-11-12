@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: October 2016
+' **  Updated: November 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -150,4 +150,5 @@ End Function
 Sub AddScore(points as integer)
     g = GetGlobalAA()
     g.runner.score += points
+    g.statusRedraw = true
 End Sub

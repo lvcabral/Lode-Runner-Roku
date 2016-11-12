@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: October 2016
+' **  Updated: November 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -138,7 +138,7 @@ Sub DrawEditorStatus(level as object)
     'Draw Title
     x = 0
     y = m.const.TILE_HEIGHT
-    WriteText(m.gameTop, padCenter("CUSTOM LEVEL EDITOR", m.const.TILES_X), x, y)
+    WriteText(m.gameTop, padCenter("CUSTOM LEVEL EDITOR", m.const.TILES_X), x, y, not m.isOpenGL)
     y = m.const.TILES_Y * m.const.TILE_HEIGHT
     ground = m.regions.tiles.Lookup("ground")
     for i = 0 to m.const.TILES_X
@@ -168,7 +168,7 @@ Sub DrawEditorStatus(level as object)
     WriteText(m.gameScreen, "LEVEL " + zeroPad(level.number, 3), x, y)
     m.gameBottom.Clear(m.colors.black)
     if level.repeat
-        WriteText(m.gameBottom, padCenter("REPEAT ON", m.const.TILES_X), 0, 0)
+        WriteText(m.gameBottom, padCenter("REPEAT ON", m.const.TILES_X), 0, 0, not m.isOpenGL)
     end if
 End Sub
 

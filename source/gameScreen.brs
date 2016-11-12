@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: October 2016
+' **  Updated: November 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -23,6 +23,7 @@ Function PlayGame(testMode = false as boolean) as boolean
     end if
     m.speed = m.gameSpeeds[m.settings.speed]
     m.gameOver = false
+    m.statusRedraw = true
     'Game Loop
     id = -1
     m.clock.Mark()
@@ -110,6 +111,7 @@ End Function
 
 Function LevelStartup() as integer
     if m.isOpenGL
+        m.statusRedraw = true
         for i = 0 to 255 step 5
             hexcolor = &hFF - i
             width = m.gameScreen.GetWidth()

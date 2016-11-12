@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: October 2016
+' **  Updated: November 2016
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -15,31 +15,38 @@ Sub DrawStatusBar()
     else
         spriteMode = m.levelSprites[m.currentLevel]
     end if
-    x = 0
-    y = m.const.TILES_Y * m.const.TILE_HEIGHT
-    ground = m.regions.tiles.Lookup("ground")
-    for i = 0 to m.const.TILES_X
-        m.gameScreen.DrawObject(x + i * m.const.TILE_WIDTH, y, ground)
-    next
-    y += m.const.GROUND_HEIGHT
-    if spriteMode = m.const.SPRITES_ZXS
-        x = WriteText(m.gameScreen, "SCORE ", x, y)
-    else
-        x = WriteText(m.gameScreen, "SCORE", x, y)
+    if m.bmpStatus = invalid or m.statusRedraw
+        statusHeight = m.gameScreen.GetHeight() - (m.const.TILES_Y * m.const.TILE_HEIGHT)
+        m.bmpStatus = CreateObject("roBitmap", {width:m.gameScreen.GetWidth(), height:statusHeight, alphaenable:false})
+        m.bmpStatus.Clear(m.colors.black)
+        x = 0
+        y = 0
+        ground = m.regions.tiles.Lookup("ground")
+        for i = 0 to m.const.TILES_X
+            m.bmpStatus.DrawObject(x + i * m.const.TILE_WIDTH, y, ground)
+        next
+        y += m.const.GROUND_HEIGHT
+        if spriteMode = m.const.SPRITES_ZXS
+            x = WriteText(m.bmpStatus, "SCORE ", x, y)
+        else
+            x = WriteText(m.bmpStatus, "SCORE", x, y)
+        end if
+        x = WriteText(m.bmpStatus, zeroPad(m.runner.score, 7), x, y)
+        if spriteMode = m.const.SPRITES_ZXS
+            x = WriteText(m.bmpStatus, " LIVES ", x, y)
+        else
+            x = WriteText(m.bmpStatus, " MEN", x, y)
+        end if
+        x = WriteText(m.bmpStatus, zeroPad(m.runner.health, 3), x, y)
+        if spriteMode = m.const.SPRITES_ZXS
+            x = WriteText(m.bmpStatus, " LEVL", x, y)
+        else
+            x = WriteText(m.bmpStatus, " LEVEL", x, y)
+        end if
+        x = WriteText(m.bmpStatus, zeroPad(m.currentLevel, 3), x, y)
+        m.statusRedraw = false
     end if
-    x = WriteText(m.gameScreen, zeroPad(m.runner.score, 7), x, y)
-    if spriteMode = m.const.SPRITES_ZXS
-        x = WriteText(m.gameScreen, " LIVES ", x, y)
-    else
-        x = WriteText(m.gameScreen, " MEN", x, y)
-    end if
-    x = WriteText(m.gameScreen, zeroPad(m.runner.health, 3), x, y)
-    if spriteMode = m.const.SPRITES_ZXS
-        x = WriteText(m.gameScreen, " LEVL", x, y)
-    else
-        x = WriteText(m.gameScreen, " LEVEL", x, y)
-    end if
-    x = WriteText(m.gameScreen, zeroPad(m.currentLevel, 3), x, y)
+    m.gameScreen.DrawObject(0, m.const.TILES_Y * m.const.TILE_HEIGHT, m.bmpStatus)
     DrawLogo(spriteMode)
 End Sub
 
@@ -51,7 +58,7 @@ Sub DrawLogo(spriteMode as integer)
     m.gameBottom.DrawObject(x, y, bmp)
 End Sub
 
-Function WriteText(canvas as object, text as string, x as integer, y as integer) as integer
+Function WriteText(canvas as object, text as string, x as integer, y as integer, redraw = false as boolean) as integer
     text = UCase(text)
     for c = 0 to len(text) - 1
         ci = asc(text.mid(c,1))
@@ -86,7 +93,7 @@ Function WriteText(canvas as object, text as string, x as integer, y as integer)
         if ci = 32 then char = "space"
         letter = m.regions.text.Lookup(char)
         if letter = invalid then letter = m.regions.text.Lookup("space")
-        if m.isOpenGL
+        if not redraw
             canvas.DrawObject(x, y, letter)
         else
             bmp = CreateObject("roBitmap", {width:letter.GetWidth(), height:letter.GetHeight(), alphaenable:true})
