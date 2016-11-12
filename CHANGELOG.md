@@ -1,3 +1,6 @@
+#####v0.13 - 12-Nov-2016 - Improved Performanfce
+* Fix: Poor performance on low end devices caused by DrawStatusBar() #37
+
 #####v0.12 - 03-Oct-2016 - Test Custom Level inside Editor
 * Add: Allow test level inside the editor #34
 * Change: Game remote key does not repeat on level editor #35
