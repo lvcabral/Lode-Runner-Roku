@@ -13,7 +13,7 @@ There are five selectable options of sprites, the original Apple II, the Commodo
 The player can also select from three different versions of the game (level sets): the Classic (150 levels), Championship (50 levels) and Professional (150 levels). 
 The level sets, guards AI and some assets were converted from the [Javascript Lode Runner](https://github.com/SimonHung/LodeRunner_TotalRecall) project by Simon Hung.
 
-The version 0.11 introduced a Customel Level Editor, so the user can created up to 5 personalized maps.
+The version 0.11 introduced a Customel Level Editor, so the user can create up to 5 personalized maps.
 
 Click the image below to watch a video with the functionality up to version 0.11:
 
