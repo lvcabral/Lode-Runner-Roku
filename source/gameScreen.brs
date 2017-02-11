@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: November 2016
+' **  Updated: February 2017
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -240,6 +240,8 @@ Sub GuardsUpdate()
                 guard.blockX = Rnd(m.const.TILES_X) - 1
                 guard.blockY = ty
                 if m.level.map[guard.blockX][ty].base = m.const.MAP_EMPTY
+                    guard.charAction = "reborn"
+                    guard.frame = 0
                     guard.alive = true
                     guard.inHole = false
                     exit for

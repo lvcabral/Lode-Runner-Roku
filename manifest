@@ -1,8 +1,8 @@
 title=Lode Runner
 subtitle=Roku remake of the Classic 8 bit Game
 major_version=0
-minor_version=13
-build_version=377
+minor_version=14
+build_version=388
 mm_icon_focus_hd=pkg:/images/icon_focus_hd.png
 mm_icon_side_hd=pkg:/images/icon_focus_hd.png
 mm_icon_focus_sd=pkg:/images/icon_side_hd.png

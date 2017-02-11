@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: September 2016
+' **  Updated: February 2017
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' **  Guards Original AI code ported from: https://github.com/SimonHung/LodeRunner_TotalRecall
@@ -120,6 +120,11 @@ Sub update_guard(runnerPos as object)
             end if
         end if
         m.state = m.STATE_MOVE
+    else if m.charAction = "reborn"
+        if m.frame = 6
+            m.charAction = "runLeft"
+            m.frame = 1
+        end if
     else if m.originalAI 'Original Game AI ported from Simon Hung JS version
         if m.state = m.STATE_FALL or m.level.status = m.const.LEVEL_STARTUP
             m.move(m.const.ACT_NONE)
