@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: October 2016
+' **  Updated: February 2017
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -17,7 +17,8 @@ Function GetConstants() as object
     const.SPRITES_IBM = 2 'IBM PC
     const.SPRITES_A8B = 3 'Atari 8 bits
     const.SPRITES_ZXS = 4 'ZX Spectrum
-    const.SPRITES_RND = 5 'Randomize
+    const.SPRITES_NES = 5 'NES
+    const.SPRITES_RND = 6 'Randomize
 
     const.VERSION_CLASSIC      = 0
     const.VERSION_CHAMPIONSHIP = 1
@@ -94,7 +95,7 @@ Function GetConstants() as object
 End Function
 
 Function GetSpriteFolder(spritesId as integer) as string
-    folders = ["ap2", "c64", "ibm", "a8b", "zxs"]
+    folders = ["ap2", "c64", "ibm", "a8b", "zxs", "nes"]
     if spritesId < folders.Count()
         return folders[spritesId]
     else

@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: November 2016
+' **  Updated: February 2017
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -189,7 +189,7 @@ Function RandomizeLevelSprites(max as integer) as object
     spriteMode = -1
     for i = 1 to max
         while spriteMode = rndArray[i - 1]
-            spriteMode = Rnd(5) - 1
+            spriteMode = Rnd(m.const.SPRITES_RND) - 1
         end while
         rndArray.Push(spriteMode)
     next

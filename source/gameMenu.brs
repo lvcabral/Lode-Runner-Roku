@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: October 2016
+' **  Updated: February 2017
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -17,12 +17,12 @@ Function StartMenu(focus as integer) as integer
     this.screen.SetMessagePort(this.port)
     this.screen.SetHeader("Game Menu")
     this.spriteModes  = ["Apple II", "Commodore 64", "IBM Personal Computer",
-                         "Atari 8 bits", "Sinclair ZX Spectrum", "Randomize!"]
+                         "Atari 8 bits", "Sinclair ZX Spectrum", "NES", "Randomize!"]
     this.spriteHelp   = ["Original Version", "", "CGA Version",
-                         "400/800/XL/XE", "", "New theme every level"]
+                         "400/800/XL/XE", "", "", "New theme every level"]
     this.spriteImage  = ["pkg:/images/apple_ii.png", "pkg:/images/commodore_64.png",
                          "pkg:/images/ibm_pc.png", "pkg:/images/atari_400.png",
-                         "pkg:/images/zx_spectrum.png", "pkg:/images/randomize.png"]
+                         "pkg:/images/zx_spectrum.png", "pkg:/images/nes.png","pkg:/images/randomize.png"]
     this.versionModes = ["Classic (1983)", "Championship (1984)", "Professional (1985)", "Custom Levels"]
     this.startLevels  = [1, 1, 1, 1]
     this.startLevels[m.settings.version] = m.settings.startLevel
