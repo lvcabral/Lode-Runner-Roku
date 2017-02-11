@@ -1,3 +1,9 @@
+#####v0.14 11-Feb-2017 - NES Sprite Mode, improved animations
+* Add: NES Sprite Mode #39
+* Fix: Runner and guards run animations have a missing frame #40
+* Fix: Hole and shake timing are not matching original game #20
+* Fix: Rebirth animation not implemented #41
+
 #####v0.13 - 12-Nov-2016 - Improved Performance
 * Fix: Poor performance on low end devices caused by DrawStatusBar() #37
 
