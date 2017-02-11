@@ -1,8 +1,8 @@
 {
     "sequence":
     {
-        "runRight":  [0, 2],
-        "runLeft":   [3, 5],
+        "runRight":  [0, 1, 2],
+        "runLeft":   [3, 4, 5],
         "runUpDown": [6, 7],
         "barRight":  [11, 12, 12, 13, 13],
         "barLeft":   [14, 15, 15, 16, 16],
