@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: February 2017
+' **  Updated: April 2017
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -193,8 +193,8 @@ End Function
 
 Function IsOpenGL() as Boolean
     di = CreateObject("roDeviceInfo")
-    model = Val(Left(di.GetModel(),1))
-    return (model = 3 or model = 4 or model = 6)
+    graph = di.GetGraphicsPlatform()
+    return (graph = "opengl")
 End Function
 
 '------- Roku Screens Functions ----
@@ -391,24 +391,12 @@ End Function
 '------- String Functions -------
 
 Function itostr(i as integer) as string
-    str = Stri(i)
-    return strTrim(str)
+    return i.ToStr()
 End Function
 
-Function strTrim(str as String) as string
-    st = CreateObject("roString")
-    st.SetString(str)
-    return st.Trim()
-End Function
-
-Function zeroPad(number as integer, length = invalid) as string
-    text = itostr(number)
-    if length = invalid then length = 2
-    if text.Len() < length
-        for i = 1 to length-text.Len()
-            text = "0" + text
-        next
-    end if
+Function zeroPad(number as integer, length = 2 as integer) as string
+    text = number.ToStr()
+    if text.Len() < length then text = String(length-text.Len(), "0") + text
     return text
 End Function
 
@@ -430,11 +418,10 @@ Function padCenter(text as string, size as integer) as string
 End Function
 
 Function padLeft(text as string, size as integer) as string
-    if Len(text) > size then text.Left(text, size)
-    if Len(text) < size
-        for c = 1 to size - Len(text)
-            text += " "
-        next
+    if Len(text) > size
+        return text.Left(size)
+    else if Len(text) < size
+        text += String(size - Len(text), 32)
     end if
     return text
 End Function
