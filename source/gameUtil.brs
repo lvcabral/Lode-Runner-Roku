@@ -421,7 +421,7 @@ Function padLeft(text as string, size as integer) as string
     if Len(text) > size
         return text.Left(size)
     else if Len(text) < size
-        text += String(size - Len(text), 32)
+        text += StringI(size - Len(text), 32)
     end if
     return text
 End Function

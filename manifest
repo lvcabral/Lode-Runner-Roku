@@ -1,7 +1,7 @@
 title=Lode Runner
 major_version=0
 minor_version=15
-build_version=403
+build_version=405
 mm_icon_focus_fhd=pkg:/images/icon_focus_hd.png
 mm_icon_focus_hd=pkg:/images/icon_focus_hd.png
 mm_icon_focus_sd=pkg:/images/icon_side_hd.png

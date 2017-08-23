@@ -1,9 +1,5 @@
 
-.buildpath
-
-.project
-
-.settings
+.vscode
 
 out
 
