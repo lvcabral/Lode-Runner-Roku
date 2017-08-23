@@ -1,3 +1,8 @@
+#####v0.15 22-Aug-2017 - Fixes and Improvements
+* Add: Performance improvements #42
+* Fix: Background flickering on some devices #43
+* Fix: Crash when adding name to high score #44
+
 #####v0.14 11-Feb-2017 - NES Sprite Mode, improved animations
 * Add: NES Sprite Mode #39
 * Fix: Runner and guards run animations have a missing frame #40
