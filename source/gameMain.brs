@@ -197,10 +197,12 @@ Function RandomizeLevelSprites(max as integer) as object
 End Function
 
 Sub SetupGameScreen()
-	if IsHD()
+	if IsWideScreen()
+        print "Starting in 16x9 mode"
 		m.mainWidth = 854
 		m.mainHeight = 480
 	else
+        print "Starting in 4x3 mode"
 		m.mainWidth = 640
 		m.mainHeight = 480
 	end if

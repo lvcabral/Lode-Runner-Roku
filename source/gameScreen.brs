@@ -11,11 +11,9 @@
 
 Function PlayGame(testMode = false as boolean) as boolean
     'Clear screen (needed for some devices)
-    m.mainScreen.Clear(0)
+    m.mainScreen.Clear(m.colors.black)
     m.mainScreen.SwapBuffers()
-    m.mainScreen.Clear(0)
-    m.mainScreen.SwapBuffers()
-    m.mainScreen.Clear(0)
+    m.mainScreen.Clear(m.colors.black)
     m.mainScreen.SwapBuffers()
     'Initialize flags and aux variables
     m.guardsMoves = [[0, 0, 0], [0, 1, 1], [1, 1, 1], [1, 2, 1], [1, 2, 2], [2, 2, 2], [2, 2, 3]]

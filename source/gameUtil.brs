@@ -181,6 +181,11 @@ End Function
 
 '------- Device Check Functions -------
 
+Function IsWideScreen()
+    di = CreateObject("roDeviceInfo")
+    return (di.GetDisplayAspectRatio() <> "4x3")
+End Function
+
 Function IsHD()
     di = CreateObject("roDeviceInfo")
     return (di.GetUIResolution().name <> "sd")
