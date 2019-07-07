@@ -3,16 +3,14 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: November 2016
+' **  Updated: July 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
 ' ********************************************************************************************************
 
 Sub EditCustomLevel(levelId as integer)
-    Sleep(500) ' Give time to Roku clear list screen from memory
-    m.mainScreen.Clear(m.colors.black)
-    m.mainScreen.SwapBuffers()
+    ClearScreenBuffers()
     map = m.custom.levels.Lookup("level-" + zeroPad(levelId, 3))
     this = {number: levelId, gold: 0, repeat: false, const: m.const, loadMap: load_map, saveMap: save_map}
     this.bitmaps = ["", "brick", "solid", "ladder", "rope", "trap", "hladder", "gold"]

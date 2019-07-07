@@ -3,18 +3,14 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: April 2017
+' **  Updated: July 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
 ' ********************************************************************************************************
 
 Function PlayGame(testMode = false as boolean) as boolean
-    'Clear screen (needed for some devices)
-    m.mainScreen.Clear(m.colors.black)
-    m.mainScreen.SwapBuffers()
-    m.mainScreen.Clear(m.colors.black)
-    m.mainScreen.SwapBuffers()
+    ClearScreenBuffers()
     'Initialize flags and aux variables
     m.guardsMoves = [[0, 0, 0], [0, 1, 1], [1, 1, 1], [1, 2, 1], [1, 2, 2], [2, 2, 2], [2, 2, 3]]
     if m.isOpenGL

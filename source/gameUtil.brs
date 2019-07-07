@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: April 2017
+' **  Updated: July 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -153,6 +153,7 @@ Function GetPaintedBitmap(color as integer, width as integer, height as integer,
 End Function
 
 Function ScaleBitmap(bitmap as object, scale as float, simpleMode = false as boolean) as object
+    if bitmap = invalid or bitmap.GetWidth() = 0 then return bitmap
     if scale = 1.0
         scaled = bitmap
     else if scale = int(scale) or simpleMode
@@ -163,6 +164,31 @@ Function ScaleBitmap(bitmap as object, scale as float, simpleMode = false as boo
         region.SetScaleMode(1)
         scaled = CreateObject("roBitmap",{width:int(bitmap.GetWidth()*scale), height:int(bitmap.GetHeight()*scale), alphaenable:bitmap.GetAlphaEnable()})
         scaled.DrawScaledObject(0,0,scale,scale,region)
+	end if
+    return scaled
+End Function
+
+Function ScaleToSize(bitmap as object, width as integer, height as integer, ratio = true as boolean) as object
+    if bitmap = invalid then return bitmap
+    if ratio and bitmap.GetWidth() <= width and bitmap.GetHeight() <= height
+        scaled = bitmap
+    else
+        region = CreateObject("roRegion", bitmap, 0, 0, bitmap.GetWidth(), bitmap.GetHeight())
+        region.SetScaleMode(1)
+        if ratio
+            if bitmap.GetWidth() > bitmap.GetHeight()
+                scale = width / bitmap.GetWidth()
+            else
+                scale = height / bitmap.GetHeight()
+            end if
+            scaled = CreateObject("roBitmap",{width:int(bitmap.GetWidth()*scale), height:int(bitmap.GetHeight()*scale), alphaenable:bitmap.GetAlphaEnable()})
+            scaled.DrawScaledObject(0,0,scale,scale,region)
+        else
+            scaleX = width / bitmap.GetWidth()
+            scaleY = height / bitmap.GetHeight()
+            scaled = CreateObject("roBitmap",{width:width, height:height, alphaenable:bitmap.GetAlphaEnable()})
+            scaled.DrawScaledObject(0,0,scaleX,scaleY,region)
+        end if
 	end if
     return scaled
 End Function
@@ -202,34 +228,42 @@ Function IsOpenGL() as Boolean
     return (graph = "opengl")
 End Function
 
-'------- Roku Screens Functions ----
-Function MessageDialog(title, text, port = invalid, buttons = 3 as integer) as integer
-    if port = invalid then port = CreateObject("roMessagePort")
-    d = CreateObject("roMessageDialog")
-    d.SetTitle(title)
-    d.SetText(text)
-    d.SetMessagePort(port)
-    if buttons = 1
-        d.AddButton(1, "OK")
-    else
-        d.AddButton(1, "Yes")
-        d.AddButton(2, "No")
-        if buttons = 3 then d.AddButton(3, "Cancel")
+Function MessageDialog(title, text, port, buttons = 3 as integer, default = 0, overlay = false) As Integer
+    if port = invalid
+        if m.port = invalid
+            port = CreateObject("roMessagePort")
+        else
+            port = m.port
+        end if
     end if
-    d.EnableOverlay(true)
-    d.Show()
-    result = 0
+    s = CreateMessageDialog()
+    s.SetTitle(title)
+    s.SetText(text)
+    s.SetMessagePort(port)
+    s.EnableOverlay(overlay)
+    if buttons = 1
+        s.AddButton(1, "OK")
+    else
+        s.AddButton(1, "Yes")
+        s.AddButton(2, "No")
+        if buttons = 3 then s.AddButton(3, "Cancel")
+    end if
+    s.SetFocusedMenuItem(default)
+    s.Show()
+    result = 99 'nothing pressed
     while true
-        msg = wait(0, port)
-        if msg.isScreenClosed()
-            exit while
-        else if msg.isButtonPressed()
+        msg = s.wait(port)
+        if msg.isButtonPressed()
             result = msg.GetIndex()
+            exit while
+        else if msg.isScreenClosed()
             exit while
         end if
     end while
     return result
 End Function
+
+'------- Roku Screens Functions ----
 
 Function KeyboardScreen(title = "", prompt = "", text = "", button1 = "Okay", button2= "Cancel", secure = false, port = invalid) as string
     if port = invalid then port = CreateObject("roMessagePort")

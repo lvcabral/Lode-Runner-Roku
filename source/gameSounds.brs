@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: September 2016
+' **  Updated: July 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -15,6 +15,7 @@ Function LoadSounds(enable as boolean) as object
                 mp3: {clip:"", priority:0, cycles:0},
                 wav: {clip:"", priority:0, cycles:0},
                 navSingle : CreateObject("roAudioResource", "navsingle"),
+                deadend : CreateObject("roAudioResource", "deadend"),
                 select : CreateObject("roAudioResource", "select")
              }
     sounds.metadata = ParseJson(ReadAsciiFile(sounds.folder + "sounds.json"))

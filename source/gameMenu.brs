@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: February 2017
+' **  Updated: July 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -11,8 +11,8 @@
 
 Function StartMenu(focus as integer) as integer
     this = {
-            screen: CreateObject("roListScreen")
-            port: CreateObject("roMessagePort")
+            screen: CreateListScreen(true)
+            port: m.port
            }
     this.screen.SetMessagePort(this.port)
     this.screen.SetHeader("Game Menu")
@@ -42,115 +42,111 @@ Function StartMenu(focus as integer) as integer
     oldIndex = 0
     selection = -1
     while true
-        msg = wait(0,this.port)
-        if msg.isScreenClosed() then exit while
-        if type(msg) = "roListScreenEvent"
-            if msg.isListItemFocused()
-                listIndex = msg.GetIndex()
-            else if msg.isListItemSelected()
-                selection = msg.GetIndex()
-                if selection = m.const.MENU_START
-                    SaveSettings(m.settings)
-                    res = m.const.MESSAGEBOX_YES
-                    if m.savedGame <> invalid
-                        res = MessageDialog("Lode Runner", "Do you want to continue unfinished game?", this.port)
-                        m.savedGame.restore = (res = m.const.MESSAGEBOX_YES)
-                    end if
-                    if res < m.const.MESSAGEBOX_CANCEL then exit while
-                else if selection = m.const.MENU_VERSION
-                    background = CreateObject("roImageCanvas")
-                    background.Show()
-                    selected = SelectStartLevel(m.settings.spriteMode, m.settings.version, m.settings.startLevel, this.port)
-                    background.Close()
-                    background = invalid
-                    if selected > 0 and m.settings.version = m.const.VERSION_CUSTOM
-                        m.settings.startLevel = selected
-                        exit while
-                    else if selected > 0 and selected <> m.settings.startLevel
-                        this.startLevels[m.settings.version] = selected
-                        m.settings.startLevel = selected
-                        listItems[selection].Title = "Version: " + this.versionModes[m.settings.version]
-                        listItems[selection].ShortDescriptionLine1 = this.versionHelp[m.settings.version] + Chr(10) + "Start Level: " + zeroPad(m.settings.startLevel, 3)
-                        imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, m.settings.startLevel)
-                        listItems[selection].HDPosterUrl = imgPath
-                        listItems[selection].SDPosterUrl = imgPath
-                        this.screen.SetItem(selection, listItems[selection])
-                    end if
-                else if selection >= m.const.MENU_HISCORES
-                    exit while
+        msg = this.screen.Wait(this.port)
+        if msg.isScreenClosed()
+            exit while
+        else if msg.isListItemFocused()
+            listIndex = msg.GetIndex()
+        else if msg.isListItemSelected()
+            selection = msg.GetIndex()
+            if selection = m.const.MENU_START
+                SaveSettings(m.settings)
+                res = m.const.MESSAGEBOX_YES
+                if m.savedGame <> invalid
+                    res = MessageDialog("Lode Runner", "Do you want to continue unfinished game?", this.port)
+                    m.savedGame.restore = (res = m.const.MESSAGEBOX_YES)
                 end if
-            else if msg.isRemoteKeyPressed()
-                remoteKey = msg.GetIndex()
-                update = (remoteKey = m.code.BUTTON_LEFT_PRESSED or remoteKey = m.code.BUTTON_RIGHT_PRESSED)
-                if remoteKey = m.code.BUTTON_REWIND_PRESSED
-                    this.screen.SetFocusedListItem(m.const.MENU_START)
-                else if remoteKey = m.code.BUTTON_FAST_FORWARD_PRESSED
-                    this.screen.SetFocusedListItem(m.const.MENU_CREDITS)
-                else if listIndex = m.const.MENU_GRAPHICS
-                    if remoteKey = m.code.BUTTON_LEFT_PRESSED
-                        m.settings.spriteMode--
-                        if m.settings.spriteMode < 0 then m.settings.spriteMode = this.spriteModes.Count() - 1
-                    else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
-                        m.settings.spriteMode++
-                        if m.settings.spriteMode = this.spriteModes.Count() then m.settings.spriteMode = 0
-                    end if
-                    if update
-                        listItems[listIndex].Title = "Graphics: " + this.spriteModes[m.settings.spriteMode]
-                        listItems[listIndex].ShortDescriptionLine1 = this.spriteHelp[m.settings.spriteMode]
-                        listItems[listIndex].HDPosterUrl = this.spriteImage[m.settings.spriteMode]
-                        listItems[listIndex].SDPosterUrl = this.spriteImage[m.settings.spriteMode]
-                        this.screen.SetItem(listIndex, listItems[listIndex])
-                        imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, m.settings.startLevel)
-                        listItems[listIndex + 1].HDPosterUrl = imgPath
-                        listItems[listIndex + 1].SDPosterUrl = imgPath
-                        this.screen.SetItem(listIndex + 1, listItems[listIndex + 1])
-                    end if
-                else if listIndex = m.const.MENU_VERSION
-                    if remoteKey = m.code.BUTTON_LEFT_PRESSED
-                        m.settings.version--
-                        if m.settings.version < 0 then m.settings.version = this.versionModes.Count() - 1
-                        m.settings.startLevel = this.startLevels[m.settings.version]
-                    else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
-                        m.settings.version++
-                        if m.settings.version = this.versionModes.Count() then m.settings.version = 0
-                        m.settings.startLevel = this.startLevels[m.settings.version]
-                    end if
-                    if update
-                        listItems[listIndex].Title = "Version: " + this.versionModes[m.settings.version]
-                        listItems[listIndex].ShortDescriptionLine1 = this.versionHelp[m.settings.version] + Chr(10) + "Start Level: " + zeroPad(m.settings.startLevel, 3)
-                        imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, m.settings.startLevel)
-                        listItems[listIndex].HDPosterUrl = imgPath
-                        listItems[listIndex].SDPosterUrl = imgPath
-                        this.screen.SetItem(listIndex, listItems[listIndex])
-                    end if
-                else if listIndex = m.const.MENU_CONTROL
-                    if remoteKey = m.code.BUTTON_LEFT_PRESSED
-                        m.settings.controlMode--
-                        if m.settings.controlMode < 0 then m.settings.controlMode = this.controlModes.Count() - 1
-                    else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
-                        m.settings.controlMode++
-                        if m.settings.controlMode = this.controlModes.Count() then m.settings.controlMode = 0
-                    end if
-                    if update
-                        listItems[listIndex].Title = "Control: " + this.controlModes[m.settings.controlMode]
-                        listItems[listIndex].ShortDescriptionLine1 = this.controlHelp[m.settings.controlMode]
-                        listItems[listIndex].HDPosterUrl = this.controlImage[m.settings.controlMode]
-                        listItems[listIndex].SDPosterUrl = this.controlImage[m.settings.controlMode]
-                        this.screen.SetItem(listIndex, listItems[listIndex])
-                    end if
-                else if listIndex = m.const.MENU_SPEED
-                    if remoteKey = m.code.BUTTON_LEFT_PRESSED
-                        m.settings.speed--
-                        if m.settings.speed < 0 then m.settings.speed = this.speedModes.Count() - 1
-                    else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
-                        m.settings.speed++
-                        if m.settings.speed = this.speedModes.Count() then m.settings.speed = 0
-                    end if
-                    if update
-                        listItems[listIndex].Title = "Game Speed: " + this.speedModes[m.settings.speed]
-                        listItems[listIndex].ShortDescriptionLine1 = this.speedHelp[m.settings.speed]
-                        this.screen.SetItem(listIndex, listItems[listIndex])
-                    end if
+                if res < m.const.MESSAGEBOX_CANCEL then exit while
+            else if selection = m.const.MENU_VERSION
+                selected = SelectStartLevel(m.settings.spriteMode, m.settings.version, m.settings.startLevel, this.port)
+                this.screen.Show()
+                if selected > 0 and m.settings.version = m.const.VERSION_CUSTOM
+                    m.settings.startLevel = selected
+                    exit while
+                else if selected > 0 and selected <> m.settings.startLevel
+                    this.startLevels[m.settings.version] = selected
+                    m.settings.startLevel = selected
+                    listItems[selection].Title = "Version: " + this.versionModes[m.settings.version]
+                    listItems[selection].ShortDescriptionLine1 = this.versionHelp[m.settings.version] + Chr(10) + "Start Level: " + zeroPad(m.settings.startLevel, 3)
+                    imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, m.settings.startLevel)
+                    listItems[selection].HDPosterUrl = imgPath
+                    listItems[selection].SDPosterUrl = imgPath
+                    this.screen.SetItem(selection, listItems[selection])
+                end if
+            else if selection >= m.const.MENU_HISCORES
+                exit while
+            end if
+        else if msg.isRemoteKeyPressed()
+            remoteKey = msg.GetIndex()
+            update = (remoteKey = m.code.BUTTON_LEFT_PRESSED or remoteKey = m.code.BUTTON_RIGHT_PRESSED)
+            if remoteKey = m.code.BUTTON_REWIND_PRESSED
+                this.screen.SetFocusedListItem(m.const.MENU_START)
+            else if remoteKey = m.code.BUTTON_FAST_FORWARD_PRESSED
+                this.screen.SetFocusedListItem(m.const.MENU_CREDITS)
+            else if listIndex = m.const.MENU_GRAPHICS
+                if remoteKey = m.code.BUTTON_LEFT_PRESSED
+                    m.settings.spriteMode--
+                    if m.settings.spriteMode < 0 then m.settings.spriteMode = this.spriteModes.Count() - 1
+                else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
+                    m.settings.spriteMode++
+                    if m.settings.spriteMode = this.spriteModes.Count() then m.settings.spriteMode = 0
+                end if
+                if update
+                    listItems[listIndex].Title = "Graphics: " + this.spriteModes[m.settings.spriteMode]
+                    listItems[listIndex].ShortDescriptionLine1 = this.spriteHelp[m.settings.spriteMode]
+                    listItems[listIndex].HDPosterUrl = this.spriteImage[m.settings.spriteMode]
+                    listItems[listIndex].SDPosterUrl = this.spriteImage[m.settings.spriteMode]
+                    this.screen.SetItem(listIndex, listItems[listIndex])
+                    imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, m.settings.startLevel)
+                    listItems[listIndex + 1].HDPosterUrl = imgPath
+                    listItems[listIndex + 1].SDPosterUrl = imgPath
+                    this.screen.SetItem(listIndex + 1, listItems[listIndex + 1])
+                end if
+            else if listIndex = m.const.MENU_VERSION
+                if remoteKey = m.code.BUTTON_LEFT_PRESSED
+                    m.settings.version--
+                    if m.settings.version < 0 then m.settings.version = this.versionModes.Count() - 1
+                    m.settings.startLevel = this.startLevels[m.settings.version]
+                else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
+                    m.settings.version++
+                    if m.settings.version = this.versionModes.Count() then m.settings.version = 0
+                    m.settings.startLevel = this.startLevels[m.settings.version]
+                end if
+                if update
+                    listItems[listIndex].Title = "Version: " + this.versionModes[m.settings.version]
+                    listItems[listIndex].ShortDescriptionLine1 = this.versionHelp[m.settings.version] + Chr(10) + "Start Level: " + zeroPad(m.settings.startLevel, 3)
+                    imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, m.settings.startLevel)
+                    listItems[listIndex].HDPosterUrl = imgPath
+                    listItems[listIndex].SDPosterUrl = imgPath
+                    this.screen.SetItem(listIndex, listItems[listIndex])
+                end if
+            else if listIndex = m.const.MENU_CONTROL
+                if remoteKey = m.code.BUTTON_LEFT_PRESSED
+                    m.settings.controlMode--
+                    if m.settings.controlMode < 0 then m.settings.controlMode = this.controlModes.Count() - 1
+                else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
+                    m.settings.controlMode++
+                    if m.settings.controlMode = this.controlModes.Count() then m.settings.controlMode = 0
+                end if
+                if update
+                    listItems[listIndex].Title = "Control: " + this.controlModes[m.settings.controlMode]
+                    listItems[listIndex].ShortDescriptionLine1 = this.controlHelp[m.settings.controlMode]
+                    listItems[listIndex].HDPosterUrl = this.controlImage[m.settings.controlMode]
+                    listItems[listIndex].SDPosterUrl = this.controlImage[m.settings.controlMode]
+                    this.screen.SetItem(listIndex, listItems[listIndex])
+                end if
+            else if listIndex = m.const.MENU_SPEED
+                if remoteKey = m.code.BUTTON_LEFT_PRESSED
+                    m.settings.speed--
+                    if m.settings.speed < 0 then m.settings.speed = this.speedModes.Count() - 1
+                else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
+                    m.settings.speed++
+                    if m.settings.speed = this.speedModes.Count() then m.settings.speed = 0
+                end if
+                if update
+                    listItems[listIndex].Title = "Game Speed: " + this.speedModes[m.settings.speed]
+                    listItems[listIndex].ShortDescriptionLine1 = this.speedHelp[m.settings.speed]
+                    this.screen.SetItem(listIndex, listItems[listIndex])
                 end if
             end if
         end if
@@ -341,9 +337,10 @@ Sub ShowHighScores(waitTime = 0 as integer)
     end while
 End Sub
 
-Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId as integer, port as object) as integer
+Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId as integer, port = invalid) as integer
     mapName = GetVersionMap(versionId)
     screen = CreateObject("roGridScreen")
+    if port = invalid then port = CreateObject("roMessagePort")
     screen.SetMessagePort(port)
     screen.SetBreadcrumbEnabled(false)
     screen.SetGridStyle("flat-landscape")

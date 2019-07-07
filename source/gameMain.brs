@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: February 2017
+' **  Updated: February 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -38,9 +38,10 @@ Sub Main()
     'Main Menu Loop
     while true
         'Configure screen/game areas based on the configuration
-        SetupGameScreen()
+        SetupMenuScreen()
         print "Starting menu..."
         selection = StartMenu(selection)
+        SetupGameScreen()
         if selection = m.const.MENU_START
             print "Starting game..."
             if m.savedGame <> invalid and m.savedGame.restore
@@ -66,7 +67,7 @@ Sub Main()
                 PlayIntro(2000)
                 if PlayGame() then ShowHighScores(5000)
             else
-                res = MessageDialog("Lode Runner", "Custom level has no runner!", invalid, 1)
+                res = MessageDialog("Lode Runner", "Custom level has no runner!", m.port, 1)
             end if
         else if selection = m.const.MENU_VERSION
             EditCustomLevel(m.settings.startLevel)
@@ -196,6 +197,22 @@ Function RandomizeLevelSprites(max as integer) as object
     Return rndArray
 End Function
 
+Sub SetupMenuScreen()
+	if IsWideScreen()
+        print "Starting in 16x9 mode"
+		m.mainWidth = 1280
+		m.mainHeight = 720
+	else
+        print "Starting in 4x3 mode"
+		m.mainWidth = 854
+		m.mainHeight = 626
+	end if
+    m.gameWidth = 560
+    m.gameHeight = 384
+    ResetScreen(m.mainWidth, m.mainHeight, m.gameWidth, m.gameHeight)
+End Sub
+
+
 Sub SetupGameScreen()
 	if IsWideScreen()
         print "Starting in 16x9 mode"
@@ -214,6 +231,7 @@ End Sub
 Sub ResetScreen(mainWidth as integer, mainHeight as integer, gameWidth as integer, gameHeight as integer)
     g = GetGlobalAA()
     g.mainScreen = CreateObject("roScreen", true, mainWidth, mainHeight)
+    g.mainScreen.SetAlphaEnable(true)
     g.mainScreen.SetMessagePort(g.port)
     xOff = Cint((mainWidth-gameWidth) / 2)
     yOff = Cint((mainHeight-gameHeight) / 2)
@@ -226,6 +244,14 @@ Sub ResetScreen(mainWidth as integer, mainHeight as integer, gameWidth as intege
     g.compositor.SetDrawTo(g.gameScreen, g.colors.black)
 End Sub
 
+Sub ClearScreenBuffers()
+    m.mainScreen.Clear(m.colors.black)
+    m.mainScreen.SwapBuffers()
+    m.mainScreen.Clear(m.colors.black)
+    m.mainScreen.SwapBuffers()
+    m.mainScreen.Clear(m.colors.black)
+End Sub
+
 Function GetTheme() as object
     theme = {
             BackgroundColor: "#000000",
@@ -236,9 +262,10 @@ Function GetTheme() as object
             GridScreenBackgroundColor: "#000000",
             GridScreenOverhangHeightSD: "90",
             GridScreenOverhangHeightHD: "135",
-            ListScreenHeaderText: "#FFFFFF",
-            ListScreenDescriptionText: "#FFFFFF",
-            ListItemHighlightText: "#FFD801"
+            ListScreenHeaderText: "#FFFFFFFF",
+            ListScreenDescriptionText: "#FFFFFFFF",
+            ListItemHighlightText: "#FFD801FF"
             }
+    m.theme = theme
     return theme
 End Function

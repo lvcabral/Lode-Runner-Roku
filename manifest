@@ -1,7 +1,7 @@
 title=Lode Runner
 major_version=0
-minor_version=15
-build_version=407
+minor_version=16
+build_version=443
 mm_icon_focus_fhd=pkg:/images/icon_focus_hd.png
 mm_icon_focus_hd=pkg:/images/icon_focus_hd.png
 mm_icon_focus_sd=pkg:/images/icon_side_hd.png
@@ -13,3 +13,4 @@ splash_color=#000000
 splash_min_time=3000
 bs_prof_enabled=false
 bs_prof_sample_ratio=0.1
+game=1
