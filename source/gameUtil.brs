@@ -263,42 +263,6 @@ Function MessageDialog(title, text, port, buttons = 3 as integer, default = 0, o
     return result
 End Function
 
-'------- Roku Screens Functions ----
-
-Function KeyboardScreen(title = "", prompt = "", text = "", button1 = "Okay", button2= "Cancel", secure = false, port = invalid) as string
-    if port = invalid then port = CreateObject("roMessagePort")
-    result = ""
-    port = CreateObject("roMessagePort")
-    screen = CreateObject("roKeyboardScreen")
-    screen.SetMessagePort(port)
-    screen.SetTitle(title)
-    screen.SetDisplayText(prompt)
-    screen.SetText(text)
-    screen.AddButton(1, button1)
-    screen.AddButton(2, button2)
-    screen.SetSecureText(secure)
-    screen.Show()
-    while true
-        msg = wait(0, port)
-
-        if type(msg) = "roKeyboardScreenEvent" then
-            if msg.isScreenClosed()
-                exit while
-            else if msg.isButtonPressed()
-                if msg.GetIndex() = 1 and screen.GetText().Trim() <> "" 'Ok
-                    result = screen.GetText()
-                    exit while
-                else if msg.GetIndex() = 2 'Cancel
-                    result = ""
-                    exit while
-                end if
-            end if
-        end if
-    end while
-    screen.Close()
-    return result
-End function
-
 '------- Registry Functions -------
 Function GetRegistryString(key as String, default = "") As String
     sec = CreateObject("roRegistrySection", "LodeRunner")

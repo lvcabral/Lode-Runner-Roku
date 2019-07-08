@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: November 2016
+' **  Updated: July 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -90,9 +90,11 @@ Function WriteText(canvas as object, text as string, x as integer, y as integer,
         end if
         'write the letter
         char = chr(ci)
+        if ci = 08 then char = "back"
+        if ci = 13 then char = "enter"
         if ci = 32 then char = "space"
         letter = m.regions.text.Lookup(char)
-        if letter = invalid then letter = m.regions.text.Lookup("space")
+        if letter = invalid then letter = m.regions.text.Lookup("block")
         if not redraw
             canvas.DrawObject(x, y, letter)
         else
