@@ -61,6 +61,7 @@ End Sub
 
 Function CheckHighScores() as boolean
     if m.runner.usedCheat then return false
+    if m.runner.score = 0 then return false
     counter = 0
     index = -1
     max = 10
@@ -105,7 +106,6 @@ Function NewHighScore(newScores as object, index as integer) as string
     playerName = ""
     key = 0
     maxNameSize = 13
-    moveCursor = false
     curButton = 0 'letter A
     curTimer = 30 'in seconds
     counter = 1
@@ -115,6 +115,7 @@ Function NewHighScore(newScores as object, index as integer) as string
         event = m.port.GetMessage()
         if type(event) = "roUniversalControlEvent"
             'Handle Remote Control events
+            moveCursor = false
             key = event.GetInt()
             if key = m.code.BUTTON_SELECT_PRESSED and curTimer > 0
                 'Select keyboard letter/button
@@ -129,18 +130,24 @@ Function NewHighScore(newScores as object, index as integer) as string
                 else if curButton = 29 'end
                     curTimer = -3
                 end if
+                m.sounds.select.Trigger(50)
             else if key = m.code.BUTTON_LEFT_PRESSED
                 moveCursor = true
-            else if key = m.code.BUTTON_RIGH_PRESSED
+            else if key = m.code.BUTTON_RIGHT_PRESSED
                 moveCursor = true
             else if key = m.code.BUTTON_UP_PRESSED
                 moveCursor = true
             else if key = m.code.BUTTON_DOWN_PRESSED
                 moveCursor = true
             end if
+            if moveCursor 
+                m.sounds.navSingle.Trigger(50)
+                curButton = DrawNameRegistration(newScores, index, playerName, curTimer, flash, curButton, key)
+                key = 0
+            end if
         else if event = invalid
             ticks = m.clock.TotalMilliseconds()
-            if ticks > 100               
+            if ticks > 100
                 if counter mod 5 = 0 then flash = not flash
                 if curTimer = 0 then exit while
                 curButton = DrawNameRegistration(newScores, index, playerName, curTimer, flash, curButton, key)

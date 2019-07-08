@@ -243,7 +243,6 @@ Sub ShowCredits(waitTime = 0 as integer)
 	end while
 End Sub
 
-
 Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId as integer, port = invalid) as integer
     mapName = GetVersionMap(versionId)
     screen = CreateObject("roGridScreen")
@@ -260,7 +259,7 @@ Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId a
         screen.SetListNames(["Levels: 1 to 50", "Levels: 51 to 100", "Levels: 101 to " + itostr(m.maps.levels.total)])
         content = [[],[],[]]
     else if m.maps.levels.total > 50
-        screen.SetupLists(3)
+        screen.SetupLists(2)
         screen.SetListNames(["Levels: 1 to 50", "Levels: 51 to " + itostr(m.maps.levels.total)])
         content = [[],[]]
     else
