@@ -20,7 +20,7 @@ Click the image below to watch a video with the functionality up to version 0.11
 [![Lode Runner for Remake for Roku (v0.11)](http://lvcabral.com/LodeRunner/images/LodeRunnerYoutubeVideo011.png)](https://www.youtube.com/watch?v=PizGMcdjIqQ)
 
 Disclaimer: This source code shall not be used commercially or sold in any form, the objective of this project is educational.
-Any usage/publication of this code should authorized by the developer.
+Any usage/publication of this code should be explicitly authorized by the author.
 
 Copyright (C) 2016 Marcelo Lv Cabral<br/>
 http://lvcabral.com <br/>
