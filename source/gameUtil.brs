@@ -205,6 +205,10 @@ Function GetManifestArray() as Object
     return aa
 End Function
 
+Function Min(a,b)
+    if a < b then return a else return b
+End Function
+
 '------- Device Check Functions -------
 
 Function IsWideScreen()

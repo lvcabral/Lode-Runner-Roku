@@ -15,6 +15,7 @@ Function LoadSounds(enable as boolean) as object
                 mp3: {clip:"", priority:0, cycles:0},
                 wav: {clip:"", priority:0, cycles:0},
                 navSingle : CreateObject("roAudioResource", "navsingle"),
+                navMulti : CreateObject("roAudioResource", "navmulti"),
                 deadend : CreateObject("roAudioResource", "deadend"),
                 select : CreateObject("roAudioResource", "select")
              }

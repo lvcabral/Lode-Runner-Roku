@@ -72,7 +72,7 @@ Sub show_canvas(scope = invalid)
         scope = m.layers.keys()
     end if
     for each id in scope
-        print "Layer "; id
+        'print "Layer "; id
         m.timer.Mark()
         layer = m.layers[id]
         if type(layer) = "roArray"
@@ -82,7 +82,7 @@ Sub show_canvas(scope = invalid)
         else
             m.Paint(layer)
         end if
-        Print "Layer took: "; m.timer.TotalMilliseconds()
+        'print "Layer took: "; m.timer.TotalMilliseconds()
     next
     m.screen.SwapBuffers()
 End Sub

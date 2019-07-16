@@ -245,80 +245,56 @@ End Sub
 
 Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId as integer, port = invalid) as integer
     mapName = GetVersionMap(versionId)
-    screen = CreateObject("roGridScreen")
+    screen = CreateGridScreen()
     if port = invalid then port = CreateObject("roMessagePort")
     screen.SetMessagePort(port)
-    screen.SetBreadcrumbEnabled(false)
-    screen.SetGridStyle("flat-landscape")
-    screen.SetDisplayMode("scale-to-fit")
     screen.ShowMessage("Loading " + mapName + " maps...")
+    if versionId < m.const.VERSION_CUSTOM
+        screen.SetListName("Select a level from the " + mapName + " version to start")
+    else 
+        screen.SetListName("Select a custom map to edit")
+    end if
     'Load the content
     m.level = CreateLevel(mapName, levelId)
-    if m.maps.levels.total > 100
-        screen.SetupLists(3)
-        screen.SetListNames(["Levels: 1 to 50", "Levels: 51 to 100", "Levels: 101 to " + itostr(m.maps.levels.total)])
-        content = [[],[],[]]
-    else if m.maps.levels.total > 50
-        screen.SetupLists(2)
-        screen.SetListNames(["Levels: 1 to 50", "Levels: 51 to " + itostr(m.maps.levels.total)])
-        content = [[],[]]
-    else
-        screen.SetupLists(1)
-        screen.SetListNames(["Levels: 1 to " + itostr(m.maps.levels.total)])
-        content = [[]]
-    end if
+    content = []
     screen.Show()
-    screen.SetDescriptionVisible(false)
-    if m.settings.version < m.const.VERSION_CUSTOM
-        for r = 0 to content.Count() - 1
-            for l = 1 to 50
-                id = 50 * r + l
-                if l < 7 or l > 48
-                    imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, id)
-                    content[r].Push({id: id, SDPosterUrl: imgPath, HDPosterUrl: imgPath})
-                else
-                    content[r].Push(invalid)
-                end if
-            next
-        next
-    else
-        for l = 1 to 5
+    for l = 1 to m.maps.levels.total
+        if l <= 15
             imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, l)
-            content[0].Push({id: l, SDPosterUrl: imgPath, HDPosterUrl: imgPath})
-        next
-    end if
-    for t = 0 to content.count()-1
-        screen.SetContentList(t, content[t])
-    end for
-    screen.SetFocusedListItem(0, 0)
+            content.Push({id: l, HDPosterUrl: imgPath})
+        else
+            imgPath = LevelMapImageExists(m.settings.spriteMode, m.settings.version, l)
+            if imgPath = ""
+                content.Push(invalid)
+            else
+                content.Push({id: l, HDPosterUrl: imgPath})
+            end if
+        end if
+    next
+    screen.SetContentList(content)
     selected = -1
     while true
-        msg = wait(0, screen.GetMessagePort())
-        if type(msg) = "roGridScreenEvent"
-            if msg.isScreenClosed()
-                exit while
-            else if msg.isListItemFocused() and m.settings.version < m.const.VERSION_CUSTOM
-                row = msg.GetIndex()
-                rowList = content[msg.GetIndex()]
-                col = msg.GetData()
-                for x = -3 to 3
-                    idx = col + x
-                    if idx < 0 then idx += 49
-                    if idx > 49 then idx -= 49
-                    levelId = 50 * row + idx + 1
-                    if rowList[idx] = invalid
-                        imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, levelId)
-                        rowList[idx] = {id: levelId, SDPosterUrl: imgPath, HDPosterUrl: imgPath}
-                        screen.SetContentList(row, rowList)
-                    end if
+        msg = screen.Wait(port)
+        if msg.isScreenClosed()
+            exit while
+        else if msg.isListItemFocused() and m.settings.version < m.const.VERSION_CUSTOM
+            idx = msg.GetIndex()
+            print "focus="; idx
+            item = content[idx]
+            if item = invalid
+                sps = idx mod 5
+                first = idx-sps
+                last = idx-sps+4
+                for i = first to last
+                    imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, i+1)
+                    screen.SetContentItem(i, {id: i+1, HDPosterUrl: imgPath})
+                    print "index=";i
                 next
-            else if msg.isListItemSelected()
-                row = msg.GetIndex()
-                rowList = content[msg.GetIndex()]
-                idx = msg.GetData()
-                selected = rowList[idx].id
-                exit while
             end if
+        else if msg.isListItemSelected()
+            item = content[msg.GetIndex()]
+            if item <> invalid then selected = item.id
+            exit while
         end if
     end while
     m.level = invalid
@@ -328,7 +304,7 @@ End Function
 Function GetLevelMapImage(spriteMode as integer, versionId as integer, levelId as integer) as string
     LoadGameSprites(spriteMode)
     mapName = GetVersionMap(versionId)
-    tmpFile = "tmp:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + ".png"
+    tmpFile = "cachefs:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + ".png"
     if not m.files.Exists(tmpFile) or versionId = m.const.VERSION_CUSTOM
         'Load level map
         level = CreateLevel(mapName, levelId)
@@ -352,8 +328,16 @@ Function GetLevelMapImage(spriteMode as integer, versionId as integer, levelId a
         font = reg.GetDefaultFont(30, true, false)
         bmp.DrawText(zeroPad(levelId, 3), (m.gameWidth - 60) / 2, m.gameHeight - 32, m.colors.white, font)
         bmp.Finish()
-        png = bmp.GetPng(0, 0, m.gameWidth, m.gameHeight)
+        pst = ScaleToSize(bmp, 210, 157)
+        png = pst.GetPng(0, 0, pst.GetWidth(), pst.GetHeight())
         png.WriteFile(tmpFile)
     end if
+    return tmpFile
+End Function
+
+Function LevelMapImageExists(spriteMode as integer, versionId as integer, levelId as integer) as string
+    mapName = GetVersionMap(versionId)
+    tmpFile = "cachefs:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + ".png"
+    if not m.files.Exists(tmpFile) then tmpFile = ""
     return tmpFile
 End Function
