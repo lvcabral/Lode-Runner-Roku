@@ -23,7 +23,9 @@ Function GetConstants() as object
     const.VERSION_CLASSIC      = 0
     const.VERSION_CHAMPIONSHIP = 1
     const.VERSION_PROFESSIONAL = 2
-    const.VERSION_CUSTOM       = 3
+    const.VERSION_REVENGE      = 3
+    const.VERSION_FANBOOK      = 4
+    const.VERSION_CUSTOM       = 5
 
     const.SPEED_VERY_SLOW = 0
     const.SPEED_SLOW      = 1
@@ -104,7 +106,7 @@ Function GetSpriteFolder(spritesId as integer) as string
 End Function
 
 Function GetVersionMap(versionId as integer) as string
-    versionMaps = ["classic", "championship", "professional", "custom"]
+    versionMaps = ["classic", "championship", "professional", "revenge", "fanbook", "custom"]
     return versionMaps[versionId]
 End Function
 
@@ -345,54 +347,9 @@ Function LoadHighScores() as Dynamic
             highScores = obj.highScores
         end if
     end if
-    if highScores = invalid then highScores = [[],[],[]]
+    if highScores = invalid then highScores = [[],[],[],[],[]]
+    if highScores.Count() = 3 then highScores.Append([[], []])
     return highScores
-End Function
-
-Sub SaveCustomLevels(custom as Object)
-    if custom <> invalid
-        SaveRegistryString("CustomLevels", FormatJSON({custom: custom}, 1))
-    end if
-End Sub
-
-Function LoadCustomLevels() as object
-    custom = invalid
-    json = GetRegistryString("CustomLevels")
-    if json <> ""
-        obj = ParseJSON(json)
-        if obj <> invalid and obj.custom <> invalid
-            custom = obj.custom
-        end if
-    end if
-    if custom = invalid
-        custom = {levels: {name: "custom", total: 5}}
-        map = [
-        "                  S         ",
-        "    $             S         ",
-        "#@#@#@#H#######   S         ",
-        "       H----------S    $    ",
-        "       H    ##H   #######H##",
-        "       H    ##H          H  ",
-        "     0 H    ##H       $0 H  ",
-        "##H#####    ########H#######",
-        "  H                 H       ",
-        "  H           0     H       ",
-        "#########H##########H       ",
-        "         H          H       ",
-        "       $ H----------H   $   ",
-        "    H######         #######H",
-        "    H         &  $         H",
-        "############################"]
-        custom.levels.AddReplace("level-001", map)
-        for l = 2 to 5
-            map = []
-            for i = 1 to m.const.TILES_Y
-                map.Push("                            ")
-            next
-            custom.levels.AddReplace("level-" + zeroPad(l, 3), map)
-        next
-    end if
-    return custom
 End Function
 
 '------- String Functions -------

@@ -2,7 +2,11 @@
 
 ### v0.16 15-July-2019 - Removed Deprecated SDK v1 Objects
 
+* Add: Version "Revenge of Lode Runner" (1986) - 17 levels #50
+* Add: Version "Lode Runner Fan Book" - 66 levels #50
+* Change: Increased custom levels from 5 to 15 #49
 * Change: Game code do not rely anymore on deprecated SDK v1 objects #47
+* Fix: After selecting a start level, back on main menu would open level editor #48
 
 ### v0.15 22-Aug-2017 - Fixes and Improvements
 

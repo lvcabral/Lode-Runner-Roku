@@ -23,11 +23,11 @@ Function StartMenu(focus as integer) as integer
     this.spriteImage  = ["pkg:/images/apple_ii.png", "pkg:/images/commodore_64.png",
                          "pkg:/images/ibm_pc.png", "pkg:/images/atari_400.png",
                          "pkg:/images/zx_spectrum.png", "pkg:/images/nes.png","pkg:/images/randomize.png"]
-    this.versionModes = ["Classic (1983)", "Championship (1984)", "Professional (1985)", "Custom Levels"]
-    this.startLevels  = [1, 1, 1, 1]
+    this.versionModes = ["Classic (1983)", "Championship (1984)", "Professional (1985)", "Revenge (1986)", "Fan Book", "Custom Levels"]
+    this.startLevels  = [1, 1, 1, 1, 1, 1]
     this.startLevels[m.settings.version] = m.settings.startLevel
-    this.versionHelp  = ["150 original levels", "50 difficult levels created by fans",
-                         "150 new levels by Dodosoft", "Edit your own custom levels"]
+    this.versionHelp  = ["150 original levels", "50 difficult levels created by fans", "150 new levels by Dodosoft",
+                         "17 levels", "66 levels", "Edit your own custom levels"]
     this.controlModes = ["Vertical Mode", "Horizontal Mode"]
     this.controlHelp  = ["", ""]
     this.controlImage = ["pkg:/images/control_vertical.png", "pkg:/images/control_horizontal.png"]
@@ -38,11 +38,11 @@ Function StartMenu(focus as integer) as integer
     this.screen.SetFocusedListItem(focus)
     this.screen.Show()
     startGame = false
-    listIndex = 0
+    listIndex = focus
     oldIndex = 0
     selection = -1
     while true
-        msg = this.screen.Wait(this.port)
+        msg = this.screen.Wait(m.port)
         if msg.isScreenClosed()
             exit while
         else if msg.isListItemFocused()
@@ -53,12 +53,12 @@ Function StartMenu(focus as integer) as integer
                 SaveSettings(m.settings)
                 res = m.const.MESSAGEBOX_YES
                 if m.savedGame <> invalid
-                    res = MessageDialog("Lode Runner", "Do you want to continue unfinished game?", this.port)
+                    res = MessageDialog("Lode Runner", "Do you want to continue unfinished game?", m.port)
                     m.savedGame.restore = (res = m.const.MESSAGEBOX_YES)
                 end if
                 if res < m.const.MESSAGEBOX_CANCEL then exit while
             else if selection = m.const.MENU_VERSION
-                selected = SelectStartLevel(m.settings.spriteMode, m.settings.version, m.settings.startLevel, this.port)
+                selected = SelectStartLevel(m.settings.spriteMode, m.settings.version, m.settings.startLevel, m.port)
                 this.screen.Show()
                 if selected > 0 and m.settings.version = m.const.VERSION_CUSTOM
                     m.settings.startLevel = selected
@@ -78,6 +78,7 @@ Function StartMenu(focus as integer) as integer
             end if
         else if msg.isRemoteKeyPressed()
             remoteKey = msg.GetIndex()
+            print "remoteKey=", remoteKey
             update = (remoteKey = m.code.BUTTON_LEFT_PRESSED or remoteKey = m.code.BUTTON_RIGHT_PRESSED)
             if remoteKey = m.code.BUTTON_REWIND_PRESSED
                 this.screen.SetFocusedListItem(m.const.MENU_START)
@@ -279,7 +280,6 @@ Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId a
             exit while
         else if msg.isListItemFocused() and m.settings.version < m.const.VERSION_CUSTOM
             idx = msg.GetIndex()
-            print "focus="; idx
             item = content[idx]
             if item = invalid
                 sps = idx mod 5
@@ -288,7 +288,6 @@ Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId a
                 for i = first to last
                     imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, i+1)
                     screen.SetContentItem(i, {id: i+1, HDPosterUrl: imgPath})
-                    print "index=";i
                 next
             end if
         else if msg.isListItemSelected()
@@ -308,6 +307,7 @@ Function GetLevelMapImage(spriteMode as integer, versionId as integer, levelId a
     if not m.files.Exists(tmpFile) or versionId = m.const.VERSION_CUSTOM
         'Load level map
         level = CreateLevel(mapName, levelId)
+        if level = invalid then return tmpFile
         'Canvas Bitmaps
         bmp = CreateObject("roBitmap", {width:m.gameWidth, height:m.gameHeight, alphaenable:true})
         'Draw level
