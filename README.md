@@ -10,7 +10,7 @@ If you have a Roku or Roku TV you can install the preview channel using this lin
 
 There are six selectable sprite modes, the original Apple II, the Commodore 64, IBM-DOS CGA, Atari 8 bits, Sinclair ZX Spectrum and NES. The sound effects are from the Commodore 64 port.
 
-The player can also select from five different versions of the game (level sets): the Classic (150 levels), Championship (50 levels), Professional (150 levels), Revenge (17 levels) and Fan Book (66 levels).
+The player can also select from five different versions of the game (level sets): the Classic (150 levels), Championship (50 levels), Professional (150 levels), Revenge (17 levels) and LR Fan Book (66 levels).
 The level sets, guards AI and some assets were converted from the [Javascript Lode Runner](https://github.com/SimonHung/LodeRunner_TotalRecall) project by Simon Hung.
 
 Using the Custom Level Editor is now possible to create up to 15 personalized maps.
