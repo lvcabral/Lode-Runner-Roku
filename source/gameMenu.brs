@@ -23,11 +23,11 @@ Function StartMenu(focus as integer) as integer
     this.spriteImage  = ["pkg:/images/apple_ii.png", "pkg:/images/commodore_64.png",
                          "pkg:/images/ibm_pc.png", "pkg:/images/atari_400.png",
                          "pkg:/images/zx_spectrum.png", "pkg:/images/nes.png","pkg:/images/randomize.png"]
-    this.versionModes = ["Classic (1983)", "Championship (1984)", "Professional (1985)", "Revenge (1986)", "Fan Book", "Custom Levels"]
+    this.versionModes = ["Classic (1983)", "Championship (1984)", "Professional (1985)", "Revenge (1986)", "LR Fan Book", "Custom Levels"]
     this.startLevels  = [1, 1, 1, 1, 1, 1]
     this.startLevels[m.settings.version] = m.settings.startLevel
-    this.versionHelp  = ["150 original levels", "50 difficult levels created by fans", "150 new levels by Dodosoft",
-                         "17 levels", "66 levels", "Edit your own custom levels"]
+    this.versionHelp  = ["150 original levels", "50 hard levels created by fans", "150 levels by Dodosoft",
+                         "17 levels by Mad Man", "66 levels", "Create up to 15 custom levels"]
     this.controlModes = ["Vertical Mode", "Horizontal Mode"]
     this.controlHelp  = ["", ""]
     this.controlImage = ["pkg:/images/control_vertical.png", "pkg:/images/control_horizontal.png"]
@@ -261,10 +261,10 @@ Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId a
     screen.Show()
     for l = 1 to m.maps.levels.total
         if l <= 15
-            imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, l)
+            imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, l, 210)
             content.Push({id: l, HDPosterUrl: imgPath})
         else
-            imgPath = LevelMapImageExists(m.settings.spriteMode, m.settings.version, l)
+            imgPath = LevelMapImageExists(m.settings.spriteMode, m.settings.version, l, 210)
             if imgPath = ""
                 content.Push(invalid)
             else
@@ -285,8 +285,8 @@ Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId a
                 sps = idx mod 5
                 first = idx-sps
                 last = idx-sps+4
-                for i = first to last
-                    imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, i+1)
+                for i = first to Min(last, content.Count()-1)
+                    imgPath = GetLevelMapImage(m.settings.spriteMode, m.settings.version, i+1, 210)
                     screen.SetContentItem(i, {id: i+1, HDPosterUrl: imgPath})
                 next
             end if
@@ -300,10 +300,10 @@ Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId a
     return selected
 End Function
 
-Function GetLevelMapImage(spriteMode as integer, versionId as integer, levelId as integer) as string
+Function GetLevelMapImage(spriteMode as integer, versionId as integer, levelId as integer, size = 300 as integer) as string
     LoadGameSprites(spriteMode)
     mapName = GetVersionMap(versionId)
-    tmpFile = "cachefs:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + ".png"
+    tmpFile = "cachefs:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + size.toStr() + ".png"
     if not m.files.Exists(tmpFile) or versionId = m.const.VERSION_CUSTOM
         'Load level map
         level = CreateLevel(mapName, levelId)
@@ -328,16 +328,16 @@ Function GetLevelMapImage(spriteMode as integer, versionId as integer, levelId a
         font = reg.GetDefaultFont(30, true, false)
         bmp.DrawText(zeroPad(levelId, 3), (m.gameWidth - 60) / 2, m.gameHeight - 32, m.colors.white, font)
         bmp.Finish()
-        pst = ScaleToSize(bmp, 210, 157)
+        pst = ScaleToSize(bmp, size, size)
         png = pst.GetPng(0, 0, pst.GetWidth(), pst.GetHeight())
         png.WriteFile(tmpFile)
     end if
     return tmpFile
 End Function
 
-Function LevelMapImageExists(spriteMode as integer, versionId as integer, levelId as integer) as string
+Function LevelMapImageExists(spriteMode as integer, versionId as integer, levelId as integer, size = 300 as integer) as string
     mapName = GetVersionMap(versionId)
-    tmpFile = "cachefs:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + ".png"
+    tmpFile = "cachefs:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + size.toStr() + ".png"
     if not m.files.Exists(tmpFile) then tmpFile = ""
     return tmpFile
 End Function

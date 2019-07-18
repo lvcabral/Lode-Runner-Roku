@@ -58,8 +58,8 @@ Sub show_list_screen()
                 TargetRect: {x:170, y:156, w:524, h:32}})
     if m.content.Count() > 0           
         imgArray.Push({
-                    url: CachedFile(m.content[m.focus].HDPosterUrl + "250x250")
-                    TargetRect: {x: 804, y: 255}})
+                    url: m.content[m.focus].HDPosterUrl 'CachedFile(m.content[m.focus].HDPosterUrl + "250x250")
+                    TargetRect: {x: 782, y: 200}})
         txtArray.Push({
                     Text: m.content[m.focus].ShortDescriptionLine1
                     TextAttrs: {color: m.theme.ListScreenDescriptionText, font: "Medium", HAlign: "Center"}
@@ -111,16 +111,7 @@ End Sub
 Sub set_list_content(list as object)
     m.content = list
     for i = 0 to m.content.Count() - 1
-        bmp = CreateObject("roBitmap",{width:250, height:250, alphaenable:true})
-        pst = ScaleToSize(CreateObject("roBitmap", m.content[i].HDPosterUrl), 250, 250)
-        if pst <> invalid
-            if pst.GetWidth() < 250 then offX = (250 - pst.GetWidth()) / 2 else offX = 0
-            if pst.GetHeight() < 250 then offY = (250 - pst.GetHeight()) / 2 else offY = 0
-            bmp.DrawObject(offX, offY, pst)
-        else
-            print "invalid list image:"; m.content[i].HDPosterUrl
-        end if
-        AddToCache(m.content[i].HDPosterUrl + "250x250", bmp)
+        m.content[i].HDPosterUrl = CenterImage(m.content[i].HDPosterUrl, 300, 300)
     next
     m.first = 0
     m.focus = 0
@@ -130,6 +121,12 @@ Sub set_list_content(list as object)
         m.last = m.content.Count() - 1
     end if
     if m.visible then m.Show()
+End Sub
+
+Sub set_content_item(index as integer, item as object, refresh = true as boolean)
+    item.HDPosterUrl = CenterImage(item.HDPosterUrl, 300, 300)
+    m.content[index] = item
+    if m.visible and refresh then m.Show()
 End Sub
 
 Function wait_list_screen(port) as object

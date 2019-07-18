@@ -90,7 +90,7 @@ Sub show_msg_dialog()
                     TargetRect: {x:254, y:menuPos.y}})
     m.canvas.SetLayer(91, imgArray)
     m.canvas.SetLayer(92, txtArray)
-    m.canvas.Show() '["91","92"])
+    m.canvas.Show()
     m.visible = true
 End Sub
 

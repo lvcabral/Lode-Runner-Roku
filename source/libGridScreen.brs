@@ -145,7 +145,7 @@ Function wait_grid_screen(port) as object
             else if index = m.codes.BUTTON_DOWN_PRESSED
                 if m.content.Count() > 0
                     m.focus += 5
-                    if m.focus >  m.content.Count() - 1
+                    if m.focus > m.content.Count() - 1
                         m.focus -= 5
                         m.sounds.deadend.Trigger(50)
                     else 
