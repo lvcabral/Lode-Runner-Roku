@@ -1,7 +1,7 @@
 # Lode Runner for Roku
 Remake of the classsic game Lode Runner (1983) for Roku streaming devices and TVs
 
-![Lode Runner for Roku](https://lvcabral.com/LodeRunner/images/splash_sd.jpg)
+![Lode Runner for Roku](http://lvcabral.com.br/LodeRunner/images/splash_sd.jpg)
 
 I developed this project during the nights and weekends of September/2016, after finishing the port of 
 [Prince of Persia for Roku](https://github.com/lvcabral/Prince-of-Persia-Roku) as part of my studies about BrightScript 2D gamming API.
