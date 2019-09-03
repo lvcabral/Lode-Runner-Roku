@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: February 2019
+' **  Updated: September 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -14,10 +14,9 @@ Sub Main()
     'Constants
     m.code = bslUniversalControlEventCodes()
     m.const = GetConstants()
-    m.colors = {black: &hFF, white: &hFFFFFFFF, darkgray: &h0F0F0FFF}
+    m.colors = {black: &hFF, white: &hFFFFFFFF, darkgray: &h0F0F0FFF, blue: &h0000FFFF}
     'Util objects
-    app = CreateObject("roAppManager")
-    app.SetTheme(GetTheme())
+    m.theme = GetTheme()
     m.port = CreateObject("roMessagePort")
     m.clock = CreateObject("roTimespan")
     m.audioPlayer = CreateObject("roAudioPlayer")
@@ -65,7 +64,9 @@ Sub Main()
             if m.level.runner <> invalid
                 'Open Game Screen
                 PlayIntro(2000)
-                if PlayGame() then ShowHighScores(5000)
+                if PlayGame()
+                    ShowHighScores(5000)
+                end if
             else
                 res = MessageDialog("Lode Runner", "Custom level has no runner!", m.port, 1)
             end if
@@ -102,7 +103,9 @@ Sub PlayIntro(waitTime as integer)
     screen.SwapBuffers()
 	while true
     	key = wait(waitTime, m.port)
-        print "intro"
+        if type(key) = "roUniversalControlEvent"
+            key = key.getInt()
+        end if
 		if key = invalid or key < 100 then exit while
 	end while
 End Sub
@@ -212,7 +215,6 @@ Sub SetupMenuScreen()
     ResetScreen(m.mainWidth, m.mainHeight, m.gameWidth, m.gameHeight)
 End Sub
 
-
 Sub SetupGameScreen()
 	if IsWideScreen()
         print "Starting in 16x9 mode"
@@ -236,11 +238,12 @@ Sub ResetScreen(mainWidth as integer, mainHeight as integer, gameWidth as intege
     xOff = Cint((mainWidth-gameWidth) / 2)
     yOff = Cint((mainHeight-gameHeight) / 2)
     drwRegions = dfSetupDisplayRegions(g.mainScreen, xOff, yOff, gameWidth, gameHeight)
+    g.gameMap = CreateObject("roBitmap", {width:g.gameWidth, height:g.gameHeight, alphaenable:true})
     g.gameScreen = drwRegions.main
     g.gameTop = drwRegions.upper
     g.gameBottom = drwRegions.lower
     g.gameScreen.SetAlphaEnable(true)
-    g.compositor = CreateObject("roCompositor")
+    if g.compositor = invalid then g.compositor = CreateObject("roCompositor")
     g.compositor.SetDrawTo(g.gameScreen, g.colors.black)
 End Sub
 
@@ -266,6 +269,5 @@ Function GetTheme() as object
             ListScreenDescriptionText: "#FFFFFFFF",
             ListItemHighlightText: "#FFD801FF"
             }
-    m.theme = theme
     return theme
 End Function

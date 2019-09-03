@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: July 2019
+' **  Updated: September 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -197,11 +197,13 @@ End Function
 
 Function GetManifestArray() as Object
     manifest = ReadAsciiFile("pkg:/manifest")
-    lines = manifest.Tokenize(chr(10))
+    lines = manifest.Split(chr(10))
     aa = {}
     for each line in lines
-        entry = line.Tokenize("=")
-        aa.AddReplace(entry[0],entry[1].Trim())
+        if line <> ""
+            entry = line.Split("=")
+            aa.AddReplace(entry[0],entry[1].Trim())
+        end if
     end for
     print aa
     return aa
@@ -221,11 +223,6 @@ End Function
 Function IsHD()
     di = CreateObject("roDeviceInfo")
     return (di.GetUIResolution().name <> "sd")
-End Function
-
-Function IsfHD()
-    di = CreateObject("roDeviceInfo")
-    return(di.GetUIResolution() = "fhd")
 End Function
 
 Function IsOpenGL() as Boolean
@@ -355,11 +352,16 @@ End Function
 '------- String Functions -------
 
 Function itostr(i as integer) as string
-    return i.ToStr()
+    'return i.ToStr() 'commented until emulator supports .ToStr()
+    if i >=0
+        return Str(i).Mid(1)
+    else
+        return Str(i)
+    end if
 End Function
 
 Function zeroPad(number as integer, length = 2 as integer) as string
-    text = number.ToStr()
+    text = itostr(number)
     if text.Len() < length then text = String(length-text.Len(), "0") + text
     return text
 End Function

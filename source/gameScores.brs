@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: July 2019
-' **  Updated: July 2019
+' **  Updated: September 2019
 ' **
 ' **  Remake in BrigthScript developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -55,6 +55,9 @@ Sub ShowHighScores(waitTime = 0 as integer)
     screen.SwapBuffers()
     while true
         key = wait(waitTime, m.port)
+        if type(key) = "roUniversalControlEvent"
+            key = key.getInt()
+        end if
         if key = invalid or key < 100 then exit while
     end while
 End Sub
@@ -77,11 +80,15 @@ Function CheckHighScores() as boolean
                 index = counter
                 newScores.Push({name: "", level: m.currentLevel, points: m.runner.score})
                 counter++
-                if counter = max then exit for
+                if counter = max
+                    exit for
+                end if
             end if
             newScores.Push(score)
             counter++
-            if counter = max then exit for
+            if counter = max
+                exit for
+            end if
         next
 		if counter < max and index < 0
 			index = counter
@@ -90,7 +97,9 @@ Function CheckHighScores() as boolean
     end if
     if index >= 0
         playerName = NewHighScore(newScores, index)
-        if playerName = "" then playerName = "< NO NAME >"
+        if playerName = ""
+            playerName = "< NO NAME >"
+        end if
         playerName = padLeft(UCase(playerName), 13)
         newScores[index].name = playerName
         m.highScores[m.settings.version] = newScores
@@ -120,13 +129,21 @@ Function NewHighScore(newScores as object, index as integer) as string
             if key = m.code.BUTTON_SELECT_PRESSED and curTimer > 0
                 'Select keyboard letter/button
                 if curButton < 26 'letter
-                    if Len(playerName) < maxNameSize then playerName += Chr(65 + curButton)
+                    if Len(playerName) < maxNameSize
+                        playerName += Chr(65 + curButton)
+                    end if
                 else if curButton = 26 'dot
-                    if Len(playerName) < maxNameSize then playerName += "."
+                    if Len(playerName) < maxNameSize
+                        playerName += "."
+                    end if
                 else if curButton = 27 'dash
-                    if Len(playerName) < maxNameSize then playerName += "-"
+                    if Len(playerName) < maxNameSize
+                        playerName += "-"
+                    end if
                 else if curButton = 28 'delete
-                    if Len(playerName) > 0 then playerName = Left(playerName, Len(playerName) - 1)
+                    if Len(playerName) > 0
+                        playerName = Left(playerName, Len(playerName) - 1)
+                    end if
                 else if curButton = 29 'end
                     curTimer = -3
                 end if
@@ -148,8 +165,12 @@ Function NewHighScore(newScores as object, index as integer) as string
         else if event = invalid
             ticks = m.clock.TotalMilliseconds()
             if ticks > 100
-                if counter mod 5 = 0 then flash = not flash
-                if curTimer = 0 then exit while
+                if counter mod 5 = 0
+                    flash = not flash
+                end if
+                if curTimer = 0
+                    exit while
+                end if
                 curButton = DrawNameRegistration(newScores, index, playerName, curTimer, flash, curButton, key)
                 if counter mod 10 = 0
                     if curTimer > 0 curTimer-- else curTimer++
@@ -209,15 +230,27 @@ Function DrawNameRegistration(newScores as object, index as integer, playerName 
 
     ' Update Cursor 
     if key = m.code.BUTTON_LEFT_PRESSED
-        if curButton = 0 then curButton = 29 else curButton--
+        if curButton = 0
+            curButton = 29
+        else
+            curButton--
+        end if
     else if key = m.code.BUTTON_UP_PRESSED
         curButton -= 10
-        if curButton < 0 then curButton +=29 
+        if curButton < 0
+            curButton +=29 
+        end if
     else if key = m.code.BUTTON_RIGHT_PRESSED 
-        if curButton >= 29 then curButton = 0 else curButton++
+        if curButton >= 29
+            curButton = 0
+        else
+            curButton++
+        end if
     else if key = m.code.BUTTON_DOWN_PRESSED
          curButton += 10
-        if curButton > 29 then curButton-=29
+        if curButton > 29
+            curButton-=29
+        end if
     end if
     x = CenterText("A B C D E F G H I J", width) - 6 + (curButton - Int(curButton / 10) * 10) * (letterWidth*2)
     y = m.yOff + Int(curButton / 10) * 30

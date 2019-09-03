@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: July 2019
+' **  Updated: September 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -37,13 +37,19 @@ Sub EditCustomLevel(levelId as integer)
                 showHelp = true
             else if key = m.code.BUTTON_FAST_FORWARD_PRESSED
                 this.tileType++
-                if this.tileType > m.const.MAP_GUARD then this.tileType = m.const.MAP_EMPTY
+                if this.tileType > m.const.MAP_GUARD
+                    this.tileType = m.const.MAP_EMPTY
+                end if
             else if key = m.code.BUTTON_REWIND_PRESSED
                 this.tileType--
-                if this.tileType < 0 then this.tileType = m.const.MAP_GUARD
+                if this.tileType < 0
+                    this.tileType = m.const.MAP_GUARD
+                end if
             else if key = m.code.BUTTON_PLAY_PRESSED
                 this.repeat = not this.repeat
-                if this.repeat then UpdateTile(this)
+                if this.repeat
+                    UpdateTile(this)
+                end if
             else if key = m.code.BUTTON_INSTANT_REPLAY_PRESSED
                 if this.runner <> invalid
                     saveOldMap = m.custom.levels.Lookup("level-" + zeroPad(levelId, 3))
@@ -71,10 +77,10 @@ Sub EditCustomLevel(levelId as integer)
         else if event = invalid
             ticks = m.clock.TotalMilliseconds()
             if ticks > speed
+                m.clock.Mark()
                 DrawCustomLevel(this, forceRedraw)
                 UpdateCursor(this, forceRedraw)
                 forceRedraw = false
-                m.compositor.AnimationTick(ticks)
                 m.compositor.DrawAll()
                 DrawEditorStatus(this)
                 if showHelp
@@ -85,7 +91,6 @@ Sub EditCustomLevel(levelId as integer)
                     showSaved = false
                 end if
                 m.mainScreen.SwapBuffers()
-                m.clock.Mark()
             end if
         end if
 	end while
@@ -144,7 +149,7 @@ Sub DrawEditorStatus(level as object)
     next
     y += m.const.GROUND_HEIGHT
     for i = m.const.MAP_BLOCK to m.const.MAP_GUARD
-        x = (i - 1) * 2 * m.const.TILE_WIDTH
+        x = (i - 1) * 2 * m.const.TILE_WIDTH + 1
         if i = m.const.MAP_RUNNR
             tileRegion = m.regions.runner.Lookup("runner_00")
         else if i = m.const.MAP_GUARD
@@ -155,12 +160,12 @@ Sub DrawEditorStatus(level as object)
         m.gameScreen.DrawObject(x, y, tileRegion)
     next
     if level.tileType > m.const.MAP_EMPTY
-        x = (level.tileType - 1) * 2 * m.const.TILE_WIDTH
+        x = (level.tileType - 1) * 2 * m.const.TILE_WIDTH + 1
         y = m.const.TILES_Y * m.const.TILE_HEIGHT + m.const.GROUND_HEIGHT
-        m.gameScreen.DrawLine(x, y, x + m.const.TILE_WIDTH, y, &hFFD80080)
-        m.gameScreen.DrawLine(x, y, x, y + m.const.TILE_HEIGHT, &hFFD80080)
-        m.gameScreen.DrawLine(x + m.const.TILE_WIDTH, y, x + m.const.TILE_WIDTH, y + m.const.TILE_HEIGHT-1, &hFFD80080)
-        m.gameScreen.DrawLine(x + m.const.TILE_WIDTH, y + m.const.TILE_HEIGHT-1, x, y + m.const.TILE_HEIGHT-1, &hFFD80080)
+        m.gameScreen.DrawLine(x, y, x + m.const.TILE_WIDTH, y, &hFFD800D0)
+        m.gameScreen.DrawLine(x, y, x, y + m.const.TILE_HEIGHT, &hFFD800D0)
+        m.gameScreen.DrawLine(x + m.const.TILE_WIDTH, y, x + m.const.TILE_WIDTH, y + m.const.TILE_HEIGHT-1, &hFFD800D0)
+        m.gameScreen.DrawLine(x + m.const.TILE_WIDTH, y + m.const.TILE_HEIGHT-1, x, y + m.const.TILE_HEIGHT-1, &hFFD800D0)
     end if
     x = m.const.TILE_WIDTH * 19
     WriteText(m.gameScreen, "LEVEL " + zeroPad(level.number, 3), x, y)
@@ -174,13 +179,29 @@ Sub UpdateCursor(level as object, forceRedraw = false as boolean)
     blockX = level.cursor.x
     blockY = level.cursor.y
     if level.control.left
-        if blockX > 0 then blockX-- else blockX = m.const.TILES_X - 1
+        if blockX > 0
+            blockX--
+        else
+            blockX = m.const.TILES_X - 1
+        end if
     else if level.control.right
-        if blockX < m.const.TILES_X - 1 then blockX++ else blockX = 0
+        if blockX < m.const.TILES_X - 1
+            blockX++
+        else
+            blockX = 0
+        end if
     else if level.control.up
-        if blockY > 0 then blockY-- else blockY = m.const.TILES_Y - 1
+        if blockY > 0
+            blockY-- 
+        else
+            blockY = m.const.TILES_Y - 1
+        end if
     else if level.control.down
-        if blockY < m.const.TILES_Y - 1 then blockY++ else blockY = 0
+        if blockY < m.const.TILES_Y - 1
+            blockY++
+        else
+            blockY = 0
+        end if
     end if
     if level.cursor.x <> blockX or level.cursor.y <> blockY or level.tileType <> level.cursor.type or forceRedraw
         bmpWidth = m.const.TILE_WIDTH + 1
@@ -194,7 +215,9 @@ Sub UpdateCursor(level as object, forceRedraw = false as boolean)
             tileRegion = m.regions.tiles.Lookup(level.bitmaps[level.tileType])
         end if
         bmp.DrawRect(0, 0, bmpWidth, bmpWidth, &hFF)
-        if tileRegion <> invalid then bmp.DrawObject(0, 0, tileRegion)
+        if tileRegion <> invalid
+            bmp.DrawObject(0, 0, tileRegion)
+        end if
         x = blockX * m.const.TILE_WIDTH
         y = blockY * m.const.TILE_HEIGHT
         bmp.DrawRect(0, 0, bmpWidth, bmpWidth, &hFFD80050)
@@ -208,7 +231,9 @@ Sub UpdateCursor(level as object, forceRedraw = false as boolean)
         level.cursor.x = blockX
         level.cursor.y = blockY
         level.cursor.type = level.tileType
-        if level.repeat then UpdateTile(level)
+        if level.repeat
+            UpdateTile(level)
+        end if
     end if
 End Sub
 
@@ -246,7 +271,9 @@ Sub DrawCanvasGrid(level as object)
     bmp = CreateObject("roBitmap", {width:m.gameWidth, height:m.gameHeight, alphaenable:true})
     for tx = 0 to m.const.TILES_X
         x = tx * m.const.TILE_WIDTH
-        if tx = m.const.TILES_X then x--
+        if tx = m.const.TILES_X 
+            x--
+        end if
         y = m.const.TILES_Y * m.const.TILE_HEIGHT
         bmp.DrawLine(x, 0, x, y, &hFFD80080)
     next
@@ -257,7 +284,9 @@ Sub DrawCanvasGrid(level as object)
     next
     bmp.Finish()
     rgn = CreateObject("roRegion", bmp, 0, 0, bmp.GetWidth(), bmp.GetHeight())
-    if level.grid <> invalid then level.grid.Remove()
+    if level.grid <> invalid
+        level.grid.Remove()
+    end if
     level.grid = m.compositor.NewSprite(0, 0, rgn, m.const.TILES_Z + 1)
 End Sub
 
@@ -302,6 +331,9 @@ Sub ShowEditorHelp()
     m.mainScreen.SwapBuffers()
     while true
         key = wait(21000, m.port)
+        if type(key) = "roUniversalControlEvent"
+            key = key.getInt()
+        end if
         if key = invalid or key < 100 then exit while
     end while
 End Sub
@@ -314,6 +346,9 @@ Sub ShowMessage(text as string)
     m.mainScreen.SwapBuffers()
     while true
         key = wait(2000, m.port)
+        if type(key) = "roUniversalControlEvent"
+            key = key.getInt()
+        end if
         if key = invalid or key < 100 then exit while
     end while
 End Sub

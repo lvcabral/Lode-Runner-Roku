@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: July 2019
+' **  Updated: September 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -14,9 +14,9 @@ Function PlayGame(testMode = false as boolean) as boolean
     'Initialize flags and aux variables
     m.guardsMoves = [[0, 0, 0], [0, 1, 1], [1, 1, 1], [1, 2, 1], [1, 2, 2], [2, 2, 2], [2, 2, 3]]
     if m.isOpenGL
-        m.gameSpeeds = [60, 40, 20, 15, 10]
+        m.gameSpeeds = [80, 60, 40, 30, 15]
     else
-        m.gameSpeeds = [40, 25, 15, 10, 5]
+        m.gameSpeeds = [55, 40, 25, 15, 10]
     end if
     m.speed = m.gameSpeeds[m.settings.speed]
     m.gameOver = false
@@ -57,9 +57,14 @@ Function PlayGame(testMode = false as boolean) as boolean
             'Game screen process
             ticks = m.clock.TotalMilliseconds()
             if ticks > m.speed
+                m.clock.Mark()
                 'Update sprites
                 RunnerUpdate()
-                if m.level.redraw then DrawLevel() else RedrawTiles()
+                if m.level.redraw
+                    DrawLevel()
+                else
+                    RedrawTiles()
+                end if
                 GuardsUpdate()
                 SoundUpdate()
                 'Paint Screen
@@ -70,7 +75,6 @@ Function PlayGame(testMode = false as boolean) as boolean
                 m.compositor.DrawAll()
                 DrawStatusBar()
                 m.mainScreen.SwapBuffers()
-                m.clock.Mark()
                 'Check runner death
                 if not m.gameOver
                     if not m.runner.alive
@@ -129,6 +133,9 @@ Function LevelStartup() as integer
     while true
         key = wait(200, m.port)
         m.runner.sprite.SetDrawableFlag(not m.runner.sprite.GetDrawableFlag())
+        if type(key) = "roUniversalControlEvent"
+            key = key.getInt()
+        end if
 		if key <> invalid and key < 100 then exit while
         m.compositor.DrawAll()
         DrawStatusBar()
@@ -152,9 +159,15 @@ Function CheckLevelSuccess() as boolean
             Sleep(60)
         next
         if m.currentLevel < m.maps.levels.total
-            if m.runner.health < m.const.LIMIT_HEALTH then m.runner.health++
+            if m.runner.health < m.const.LIMIT_HEALTH
+                m.runner.health++
+            end if
             NextLevel()
-            if m.gameOver then finish = true else SaveGame()
+            if m.gameOver
+                finish = true
+            else
+                SaveGame()
+            end if
         else
             finish = true
         end if
@@ -171,6 +184,9 @@ Sub PauseGame()
     m.mainScreen.SwapBuffers()
     while true
         key = wait(0, m.port)
+        if type(key) = "roUniversalControlEvent"
+            key = key.getInt()
+        end if
         if key = m.code.BUTTON_PLAY_PRESSED then exit while
     end while
 End Sub
@@ -191,6 +207,9 @@ Sub GameOver()
     m.mainScreen.SwapBuffers()
     while true
         key = wait(5000, m.port)
+        if type(key) = "roUniversalControlEvent"
+            key = key.getInt()
+        end if
 		if key = invalid or key < 100 then exit while
 	end while
     sprite.Remove()
@@ -223,14 +242,22 @@ End Sub
 Sub GuardsUpdate()
     guardsCount = m.guards.Count()
     if guardsCount = 0 then return
-    if m.nextMoves = 2 then m.nextMoves = 0 else m.nextMoves++
+    if m.nextMoves = 2
+        m.nextMoves = 0 
+    else 
+        m.nextMoves++
+    end if
     if m.level.status = m.const.LEVEL_STARTUP
         movesCount = guardsCount
     else
         movesCount = m.guardsMoves[guardsCount][m.nextMoves]
     end if
     while movesCount > 0
-        if m.nextGuard = guardsCount - 1 then m.nextGuard = 0 else m.nextGuard++
+        if m.nextGuard = guardsCount - 1
+            m.nextGuard = 0 
+        else 
+            m.nextGuard++
+        end if
         guard = m.guards[m.nextGuard]
         if not guard.alive
             for ty = 0 to m.const.TILES_Y-1
@@ -269,6 +296,8 @@ Sub DrawLevel()
     'Clear old sprites
     DestroyStage()
     'Draw level
+    if m.levelComp = invalid then m.levelComp = CreateObject("roCompositor")
+    m.levelComp.SetDrawTo(m.gameMap, m.colors.black)
     for ty = m.const.TILES_Y-1 to 0 step -1
 		for tx = m.const.TILES_X-1 to 0 step -1
             tile = m.level.map[tx][ty]
@@ -277,23 +306,32 @@ Sub DrawLevel()
                 if tileRegion <> invalid
                     x = tx * m.const.TILE_WIDTH
                     y = ty * m.const.TILE_HEIGHT
-                    tile.sprite = m.compositor.NewSprite(x, y, tileRegion, m.const.TILES_Z)
+                    if tile.base = m.const.MAP_GOLD
+                        tile.sprite = m.compositor.NewSprite(x, y, tileRegion, m.const.TILES_Z)
+                    else
+                        tile.sprite = m.levelComp.NewSprite(x, y, tileRegion, m.const.TILES_Z)
+                    end if
                     tile.sprite.SetMemberFlags(0)
                     tile.sprite.SetData(tile.bitmap)
                     if tile.base = m.const.MAP_HLADR
-                        if m.level.gold = 0 then tile.act = m.const.MAP_LADDR
+                        if m.level.gold = 0
+                            tile.act = m.const.MAP_LADDR
+                        end if
                         tile.sprite.SetDrawableFlag(m.level.gold = 0)
                     end if
                 end if
             end if
         next
     next
+    m.levelComp.DrawAll()
+    m.backSprite = m.compositor.NewSprite(0, 0, CreateObject("roRegion",m.gameMap,0,0,m.gameWidth,m.gameHeight), 2)
+    m.backSprite.SetMemberFlags(0)
     m.level.redraw = false
 End Sub
 
 Sub RedrawTiles()
-    for ty = m.const.TILES_Y-1 to 0 step -1
-		for tx = m.const.TILES_X-1 to 0 step -1
+    for ty = 0 to m.const.TILES_Y-1
+		for tx = 0 to m.const.TILES_X-1
             tile = m.level.map[tx][ty]
             if tile.bitmap <> invalid
                 if tile.hole
@@ -337,16 +375,25 @@ Sub RedrawTiles()
                     end if
                     tileRegion = m.regions.hole.Lookup(frameName)
                     if tileRegion <> invalid
-                        if tile.sprite <> invalid then tile.sprite.Remove()
+                        if tile.sprite <> invalid
+                            tile.sprite.Remove()
+                        end if
                         x = tx * m.const.TILE_WIDTH
                         y = ty * m.const.TILE_HEIGHT
                         yOff = tileRegion.GetHeight() - 22
-                        tile.sprite = m.compositor.NewSprite(x, y - yOff, tileRegion, m.const.CHARS_Z + 1)
+                        if frameName = "hole_19" or tile.bitmap = "brick"
+                            holeZ = m.const.CHARS_Z + 1
+                        else
+                            holeZ = m.const.CHARS_Z - 1
+                        end if
+                        tile.sprite = m.compositor.NewSprite(x, y - yOff, tileRegion, holeZ)
                         tile.sprite.SetMemberFlags(0)
                         tile.sprite.SetData(tile.bitmap)
                     end if
                 else if tile.redraw or ShowHiddenLadder(tile)
-                    if tile.sprite <> invalid then tile.sprite.Remove()
+                    if tile.sprite <> invalid
+                        tile.sprite.Remove()
+                    end if
                     tileRegion = m.regions.tiles.Lookup(tile.bitmap)
                     if tileRegion <> invalid
                         x = tx * m.const.TILE_WIDTH
@@ -355,13 +402,17 @@ Sub RedrawTiles()
                         tile.sprite.SetMemberFlags(0)
                         tile.sprite.SetData(tile.bitmap)
                         if tile.base = m.const.MAP_HLADR
-                            if m.level.gold = 0 then tile.act = m.const.MAP_LADDR
+                            if m.level.gold = 0
+                                tile.act = m.const.MAP_LADDR
+                            end if
                             tile.sprite.SetDrawableFlag(m.level.gold = 0)
                         end if
                     end if
                 end if
             else
-                if tile.sprite <> invalid then tile.sprite.Remove()
+                if tile.sprite <> invalid
+                    tile.sprite.Remove()
+                end if
             end if
             tile.redraw = false
         next
@@ -389,8 +440,12 @@ End Sub
 
 Sub DestroyStage()
     g = GetGlobalAA()
-    for ty = g.const.TILES_Y-1 to 0 step -1
-        for tx = g.const.TILES_X-1 to 0 step -1
+    if g.backSprite <> invalid
+        g.backSprite.Remove()
+        g.backSprite = invalid
+    end if
+    for ty = 0 to g.const.TILES_Y-1
+        for tx = 0 to g.const.TILES_X-1
             if g.level.map[tx][ty].sprite <> invalid
                 g.level.map[tx][ty].sprite.Remove()
                 g.level.map[tx][ty].sprite = invalid

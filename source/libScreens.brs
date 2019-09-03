@@ -4,7 +4,7 @@
 ' **
 ' **  libCanvas.brs - Library with generic methods for Screen objects
 ' **  Created: June 2018
-' **  Updated: July 2019
+' **  Updated: September 2019
 ' **
 ' **  Copyright (C) Marcelo Lv Cabral < https://lvcabral.com >
 ' ********************************************************************************************************
@@ -104,7 +104,7 @@ Function AddToCache(fileName as string, bmp as object, update = false as boolean
     tmpFile = g.cache.Lookup(fileName)
     if tmpFile = invalid
         g.cacheId++
-        tmpFile = "tmp:/cached" + g.cacheId.toStr() + ".png"
+        tmpFile = "tmp:/cached" + itostr(g.cacheId) + ".png"
         g.cache.AddReplace(fileName,tmpFile)
     end if
     if update or not g.files.Exists(tmpFile)

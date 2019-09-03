@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: July 2019
+' **  Updated: September 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -56,7 +56,9 @@ Function StartMenu(focus as integer) as integer
                     res = MessageDialog("Lode Runner", "Do you want to continue unfinished game?", m.port)
                     m.savedGame.restore = (res = m.const.MESSAGEBOX_YES)
                 end if
-                if res < m.const.MESSAGEBOX_CANCEL then exit while
+                if res < m.const.MESSAGEBOX_CANCEL
+                    exit while
+                end if
             else if selection = m.const.MENU_VERSION
                 selected = SelectStartLevel(m.settings.spriteMode, m.settings.version, m.settings.startLevel, m.port)
                 this.screen.Show()
@@ -87,10 +89,14 @@ Function StartMenu(focus as integer) as integer
             else if listIndex = m.const.MENU_GRAPHICS
                 if remoteKey = m.code.BUTTON_LEFT_PRESSED
                     m.settings.spriteMode--
-                    if m.settings.spriteMode < 0 then m.settings.spriteMode = this.spriteModes.Count() - 1
+                    if m.settings.spriteMode < 0 
+                        m.settings.spriteMode = this.spriteModes.Count() - 1
+                    end if
                 else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
                     m.settings.spriteMode++
-                    if m.settings.spriteMode = this.spriteModes.Count() then m.settings.spriteMode = 0
+                    if m.settings.spriteMode = this.spriteModes.Count()
+                        m.settings.spriteMode = 0
+                    end if
                 end if
                 if update
                     listItems[listIndex].Title = "Graphics: " + this.spriteModes[m.settings.spriteMode]
@@ -106,11 +112,15 @@ Function StartMenu(focus as integer) as integer
             else if listIndex = m.const.MENU_VERSION
                 if remoteKey = m.code.BUTTON_LEFT_PRESSED
                     m.settings.version--
-                    if m.settings.version < 0 then m.settings.version = this.versionModes.Count() - 1
+                    if m.settings.version < 0
+                        m.settings.version = this.versionModes.Count() - 1
+                    end if
                     m.settings.startLevel = this.startLevels[m.settings.version]
                 else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
                     m.settings.version++
-                    if m.settings.version = this.versionModes.Count() then m.settings.version = 0
+                    if m.settings.version = this.versionModes.Count()
+                        m.settings.version = 0
+                    end if
                     m.settings.startLevel = this.startLevels[m.settings.version]
                 end if
                 if update
@@ -124,10 +134,14 @@ Function StartMenu(focus as integer) as integer
             else if listIndex = m.const.MENU_CONTROL
                 if remoteKey = m.code.BUTTON_LEFT_PRESSED
                     m.settings.controlMode--
-                    if m.settings.controlMode < 0 then m.settings.controlMode = this.controlModes.Count() - 1
+                    if m.settings.controlMode < 0
+                        m.settings.controlMode = this.controlModes.Count() - 1
+                    end if
                 else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
                     m.settings.controlMode++
-                    if m.settings.controlMode = this.controlModes.Count() then m.settings.controlMode = 0
+                    if m.settings.controlMode = this.controlModes.Count()
+                        m.settings.controlMode = 0
+                    end if
                 end if
                 if update
                     listItems[listIndex].Title = "Control: " + this.controlModes[m.settings.controlMode]
@@ -139,10 +153,14 @@ Function StartMenu(focus as integer) as integer
             else if listIndex = m.const.MENU_SPEED
                 if remoteKey = m.code.BUTTON_LEFT_PRESSED
                     m.settings.speed--
-                    if m.settings.speed < 0 then m.settings.speed = this.speedModes.Count() - 1
+                    if m.settings.speed < 0
+                        m.settings.speed = this.speedModes.Count() - 1
+                    end if
                 else if remoteKey = m.code.BUTTON_RIGHT_PRESSED
                     m.settings.speed++
-                    if m.settings.speed = this.speedModes.Count() then m.settings.speed = 0
+                    if m.settings.speed = this.speedModes.Count()
+                        m.settings.speed = 0
+                    end if
                 end if
                 if update
                     listItems[listIndex].Title = "Game Speed: " + this.speedModes[m.settings.speed]
@@ -240,6 +258,9 @@ Sub ShowCredits(waitTime = 0 as integer)
     screen.SwapBuffers()
 	while true
     	key = wait(waitTime, m.port)
+        if type(key) = "roUniversalControlEvent"
+            key = key.getInt()
+        end if
 		if key = invalid or key < 100 then exit while
 	end while
 End Sub
@@ -292,7 +313,9 @@ Function SelectStartLevel(spriteMode as integer, versionId as integer, levelId a
             end if
         else if msg.isListItemSelected()
             item = content[msg.GetIndex()]
-            if item <> invalid then selected = item.id
+            if item <> invalid
+                selected = item.id
+            end if
             exit while
         end if
     end while
@@ -303,11 +326,13 @@ End Function
 Function GetLevelMapImage(spriteMode as integer, versionId as integer, levelId as integer, size = 300 as integer) as string
     LoadGameSprites(spriteMode)
     mapName = GetVersionMap(versionId)
-    tmpFile = "cachefs:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + size.toStr() + ".png"
+    tmpFile = "cachefs:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + itostr(size) + ".png"
     if not m.files.Exists(tmpFile) or versionId = m.const.VERSION_CUSTOM
         'Load level map
         level = CreateLevel(mapName, levelId)
-        if level = invalid then return tmpFile
+        if level = invalid
+            return tmpFile
+        end if
         'Canvas Bitmaps
         bmp = CreateObject("roBitmap", {width:m.gameWidth, height:m.gameHeight, alphaenable:true})
         'Draw level
@@ -337,7 +362,9 @@ End Function
 
 Function LevelMapImageExists(spriteMode as integer, versionId as integer, levelId as integer, size = 300 as integer) as string
     mapName = GetVersionMap(versionId)
-    tmpFile = "cachefs:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + size.toStr() + ".png"
-    if not m.files.Exists(tmpFile) then tmpFile = ""
+    tmpFile = "cachefs:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + itostr(size) + ".png"
+    if not m.files.Exists(tmpFile)
+        tmpFile = ""
+    end if
     return tmpFile
 End Function

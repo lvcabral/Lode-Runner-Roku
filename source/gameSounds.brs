@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: July 2019
+' **  Updated: September 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -22,7 +22,7 @@ Function LoadSounds(enable as boolean) as object
     sounds.metadata = ParseJson(ReadAsciiFile(sounds.folder + "sounds.json"))
     for each name in sounds.metadata.clips
         clip = sounds.metadata.clips.Lookup(name)
-        if clip.type = "wav"
+        if clip <> invalid and clip.type = "wav"
             sounds.AddReplace(name,CreateObject("roAudioResource", sounds.folder + name + ".wav"))
         end if
     next

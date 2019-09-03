@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: July 2019
-' **  Updated: July 2019
+' **  Updated: September 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -86,7 +86,9 @@ End Function
 Function CompressMaps(maps as object) as object
     result = []
     sumversion = 0
-    if maps = invalid or not maps.DoesExist("levels") then return invalid
+    if maps = invalid or not maps.DoesExist("levels")
+        return invalid
+    end if
     for l = 1 to maps.levels.total
         compressed = ""
         levelMap = maps.levels.Lookup("level-" + zeroPad(l,3))
@@ -96,7 +98,9 @@ Function CompressMaps(maps as object) as object
             for x = 0 to m.const.TILES_X-1
                 id = levelMap[y].Mid(x, 1)
                 if id <> current
-                    if counter > 1 then compressed += counter.toStr()
+                    if counter > 1
+                        compressed += itostr(counter)
+                    end if
                     if id <> "0"
                         compressed += id
                     else
@@ -108,18 +112,20 @@ Function CompressMaps(maps as object) as object
                     counter++
                 end if
             next
-            if counter > 1 then compressed += counter.toStr()
+            if counter > 1
+                compressed += itostr(counter)
+            end if
         next
         sumversion += len(compressed)
         result.Push(compressed)
-        print "map ";l; " ["; compressed; "] "; len(compressed)
+        'print "map ";l; " ["; compressed; "] "; len(compressed)
     next
     return result
 End Function
 
 Function UncompressMap(compressed as string) as object
-    print "Uncompress" + Chr(10)
-    print compressed
+    ' print "Uncompress" + Chr(10)
+    ' print compressed
     id = ""
     last = ""
     level = []

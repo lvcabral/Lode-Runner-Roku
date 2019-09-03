@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: February 2017
+' **  Updated: September 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' **  Guards Original AI code ported from: https://github.com/SimonHung/LodeRunner_TotalRecall
@@ -32,7 +32,7 @@ Function CreateGuard(level as object, guardPos as object) as object
     return ImplementActor(this)
 End Function
 
-Sub start_level_guard(level as object, guardPos as object)
+Sub start_level_guard(level as object, guardPos as object)    
     m.level = level
     m.blockX = guardPos.x
     m.blockY = guardPos.y
@@ -52,10 +52,18 @@ Sub update_guard(runnerPos as object)
     downTile = invalid
     leftTile = invalid
     rightTile = invalid
-    if y > 0 then upTile = m.level.map[x][y-1]
-    if y < m.const.TILES_Y-1 then downTile = m.level.map[x][y+1]
-    if x > 0 then leftTile = m.level.map[x-1][y]
-    if x < m.const.TILES_X-1 then rightTile = m.level.map[x+1][y]
+    if y > 0
+        upTile = m.level.map[x][y-1]
+    end if
+    if y < m.const.TILES_Y-1
+        downTile = m.level.map[x][y+1]
+    end if
+    if x > 0
+        leftTile = m.level.map[x-1][y]
+    end if
+    if x < m.const.TILES_X-1
+        rightTile = m.level.map[x+1][y]
+    end if
     if curTile.hole or m.inHole
         'Release gold
         if curTile.hole and m.hasGold > 0
@@ -244,7 +252,9 @@ Function scan_floor_guard(runnerPos as object) as integer
 	guardAI.leftEnd = m.blockX
 	while guardAI.leftEnd > 0
 		curTile = map[guardAI.leftEnd - 1][y]
-		if curTile.act = m.const.MAP_BLOCK or curTile.act = m.const.MAP_SOLID then exit while
+		if curTile.act = m.const.MAP_BLOCK or curTile.act = m.const.MAP_SOLID
+            exit while
+        end if
 		downTile = map[guardAI.leftEnd - 1][y + 1]
 		if IsLadder(curTile, false) or IsBar(curTile) or y >= maxTileY or y < maxTileY and IsFloor(downTile, true, false)
 			guardAI.leftEnd--
@@ -257,7 +267,9 @@ Function scan_floor_guard(runnerPos as object) as integer
 	guardAI.rightEnd = m.blockX
 	while guardAI.rightEnd < maxTileX
 		curTile = map[guardAI.rightEnd + 1][y]
-		if curTile.act = m.const.MAP_BLOCK or curTile.act = m.const.MAP_SOLID then exit while
+		if curTile.act = m.const.MAP_BLOCK or curTile.act = m.const.MAP_SOLID
+            exit while
+        end if
 		downTile = map[guardAI.rightEnd + 1][y + 1]
 		if IsLadder(curTile, false) or isBar(curTile) or y >= maxTileY or y < maxTileY and IsFloor(downTile, true, false)
 			guardAI.rightEnd++
@@ -295,7 +307,11 @@ Function scan_floor_guard(runnerPos as object) as integer
 		if map[x][y].base = m.const.MAP_LADDR
 			m.scanUp(x, curPath, guardAI, runnerPos)
 		end if
-		if curPath = m.const.ACT_LEFT then x++ else x--
+		if curPath = m.const.ACT_LEFT
+            x++ 
+        else 
+            x--
+        end if
 	end while
 	return guardAI.bestPath
 End Function
@@ -312,13 +328,17 @@ Sub scan_down_guard(x as integer, curPath as integer, guardAI as object, runnerP
 			if x > 0
 				downTile = map[x - 1][y + 1]
 				if IsFloor(downTile, true, false) or map[x - 1][y].base = m.const.MAP_BAR
-					if y >= runnerY then exit while
+					if y >= runnerY
+                        exit while
+                    end if
 				end if
 			end if
 			if x < maxTileX
 				downTile = map[x + 1][y + 1]
 				if IsFloor(downTile, true, false) or map[x + 1][y].base = m.const.MAP_BAR
-					if y >= runnerY then exit while
+					if y >= runnerY
+                        exit while
+                    end if
 				end if
 			end if
 		end if
@@ -347,13 +367,17 @@ Sub scan_up_guard(x as integer, curPath as integer, guardAI as object, runnerPos
 		if x > 0
 			downTile = map[x - 1][y + 1]
 			if IsFloor(downTile, true, false) or map[x - 1][y].base = m.const.MAP_BAR
-				if y <= runnerY then exit while
+				if y <= runnerY
+                    exit while
+                end if
 			end if
 		end if
 		if x < m.const.TILES_X - 1
 			downTile = map[x + 1][y + 1]
 			if IsFloor(downTile, true, false) or map[x + 1][y].base = m.const.MAP_BAR
-				if y <= runnerY then exit while
+				if y <= runnerY
+                    exit while
+                end if
 			end if
 		end if
 	end while

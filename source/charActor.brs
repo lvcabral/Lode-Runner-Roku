@@ -3,7 +3,7 @@
 ' **  Roku Lode Runner Channel - http://github.com/lvcabral/Lode-Runner-Roku
 ' **
 ' **  Created: September 2016
-' **  Updated: September 2016
+' **  Updated: September 2019
 ' **
 ' **  Remake in Brightscropt developed by Marcelo Lv Cabral - http://lvcabral.com
 ' ********************************************************************************************************
@@ -55,12 +55,24 @@ Sub move_actor(action)
     downTile2 = invalid
     leftTile = invalid
     rightTile = invalid
-    if m.blockY > 0 then upTile = m.level.map[m.blockX][m.blockY-1]
-    if m.blockY < m.const.TILES_Y-1 then downTile = m.level.map[m.blockX][m.blockY+1]
-    if m.blockY < m.const.TILES_Y-2 then downTile2 = m.level.map[m.blockX][m.blockY + 2]
-    if m.blockX > 0 then leftTile = m.level.map[m.blockX-1][m.blockY]
-    if m.blockX < m.const.TILES_X-1 then rightTile = m.level.map[m.blockX+1][m.blockY]
-    if m.state <> m.STATE_FALL or IsFloor(downTile) then m.state = m.STATE_STOP
+    if m.blockY > 0
+        upTile = m.level.map[m.blockX][m.blockY-1]
+    end if
+    if m.blockY < m.const.TILES_Y-1
+        downTile = m.level.map[m.blockX][m.blockY+1]
+    end if
+    if m.blockY < m.const.TILES_Y-2
+        downTile2 = m.level.map[m.blockX][m.blockY + 2]
+    end if
+    if m.blockX > 0
+        leftTile = m.level.map[m.blockX-1][m.blockY]
+    end if
+    if m.blockX < m.const.TILES_X-1
+        rightTile = m.level.map[m.blockX+1][m.blockY]
+    end if
+    if m.state <> m.STATE_FALL or IsFloor(downTile)
+        m.state = m.STATE_STOP
+    end if
     if m.state = m.STATE_FALL
         if curTile.base = m.const.MAP_BAR and m.offsetY = 0
             m.state = m.STATE_MOVE
@@ -99,7 +111,9 @@ Sub move_actor(action)
                 if IsLadder(curTile, hladr) and not IsBarrier(upTile)
                     m.blockY--
                     m.offsetY += m.const.TILE_HEIGHT
-                    if m.charType = "guard" then m.tryDropGold()
+                    if m.charType = "guard"
+                        m.tryDropGold()
+                    end if
                 else
                     m.offsetY = 0
                 end if
@@ -117,13 +131,17 @@ Sub move_actor(action)
             if m.offsetY >= m.const.TILE_HEIGHT
                 m.blockY++
                 m.offsetY -= m.const.TILE_HEIGHT
-                if m.offsetY < m.const.MOVE_Y then m.offsetY = 0
+                if m.offsetY < m.const.MOVE_Y
+                    m.offsetY = 0
+                end if
                 if not IsFloor(downTile) and not IsFloor(downTile2)
                     m.state = m.STATE_FALL
                     m.charAction = "fallLeft"
                     m.frame = 0
                 end if
-                if m.charType = "guard" then m.tryDropGold()
+                if m.charType = "guard"
+                    m.tryDropGold()
+                end if
             end if
         else if (curTile.base = m.const.MAP_BAR or curTile.base = m.const.MAP_EMPTY) and not IsFloor(downTile)
             m.state = m.STATE_FALL
@@ -151,7 +169,9 @@ Sub move_actor(action)
             if m.offsetX < 0
                 m.blockX--
                 m.offsetX += m.const.TILE_WIDTH
-                if m.charType = "guard" then m.tryDropGold()
+                if m.charType = "guard"
+                    m.tryDropGold()
+                end if
             end if
             m.offsetY = 0
         end if
@@ -176,7 +196,9 @@ Sub move_actor(action)
             if m.offsetX >= m.const.TILE_WIDTH / 2
                 m.blockX++
                 m.offsetX -= m.const.TILE_WIDTH
-                if m.charType = "guard" then m.tryDropGold()
+                if m.charType = "guard"
+                    m.tryDropGold()
+                end if
             end if
             m.offsetY = 0
         else if m.offsetX < 0
@@ -198,8 +220,12 @@ Sub move_actor(action)
         if m.offsetY >= m.const.TILE_HEIGHT
             m.blockY++
             m.offsetY -= m.const.TILE_HEIGHT
-            if m.offsetY < m.const.MOVE_Y then m.offsetY = 0
-            if m.charType = "guard" then m.tryDropGold()
+            if m.offsetY < m.const.MOVE_Y
+                m.offsetY = 0
+            end if
+            if m.charType = "guard"
+                m.tryDropGold()
+            end if
         end if
     end if
 End Sub
@@ -210,6 +236,8 @@ Sub frame_update_actor()
         actionArray = m.animations.sequence.Lookup(m.charAction)
         m.frameName = m.charType + "_" + zeroPad(actionArray[m.frame])
         m.frame++
-        if m.frame >= actionArray.Count() then m.frame = 0
+        if m.frame >= actionArray.Count()
+            m.frame = 0
+        end if
     end if
 End Sub

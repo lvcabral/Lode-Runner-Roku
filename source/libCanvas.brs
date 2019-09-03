@@ -4,7 +4,7 @@
 ' **
 ' **  libCanvas.brs - Library to implement generic Canvas object
 ' **  Created: June 2018
-' **  Updated: July 2019
+' **  Updated: September 2019
 ' **
 ' **  Copyright (C) Marcelo Lv Cabral < https://lvcabral.com >
 ' ********************************************************************************************************
@@ -37,7 +37,6 @@ Function CreateCanvas() as object
         m.fonts.AddReplace("big", m.fonts.reg.GetDefaultFont(40 * this.scale, false, false))
         m.fonts.AddReplace("huge", m.fonts.reg.GetDefaultFont(46 * this.scale, false, false))       
     end if
-    print "check font huge:";this.fonts.huge
     this.stackId = m.stack.Count()
     m.stack.Push(this)
     return this
@@ -57,12 +56,12 @@ Function get_canvas_rect() as object
 End Function
 
 Sub set_layer(zOrder as integer, layer as object)
-    m.layers.AddReplace(zOrder.ToStr(), layer)
+    m.layers.AddReplace(itostr(zOrder), layer)
 End Sub
 
 Sub clear_layer(zOrder as integer)
-    if m.layers.DoesExist(zOrder.ToStr())
-        m.layers.Delete(zOrder.ToStr())
+    if m.layers.DoesExist(itostr(zOrder))
+        m.layers.Delete(itostr(zOrder))
     end if
 End Sub
 
@@ -99,9 +98,11 @@ Sub paint_component(component as object)
         rect = m.GetCanvasRect()
     end if
     if component.DoesExist("Text")
-        if type(component.TextAttrs.font) = "roString"
+        if type(component.TextAttrs.font) = "roString" or type(component.TextAttrs.font) = "String"
             font = m.fonts.Lookup(component.TextAttrs.font)
-            if font = invalid then font = m.fonts.large
+            if font = invalid 
+                font = m.fonts.medium
+            end if
         else if type(component.TextAttrs.font) = "roFont"
             font = component.TextAttrs.font
         else
