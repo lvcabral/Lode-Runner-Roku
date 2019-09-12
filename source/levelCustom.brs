@@ -99,7 +99,7 @@ Function CompressMaps(maps as object) as object
                 id = levelMap[y].Mid(x, 1)
                 if id <> current
                     if counter > 1
-                        compressed += itostr(counter)
+                        compressed += counter.toStr()
                     end if
                     if id <> "0"
                         compressed += id
@@ -113,7 +113,7 @@ Function CompressMaps(maps as object) as object
                 end if
             next
             if counter > 1
-                compressed += itostr(counter)
+                compressed += counter.toStr()
             end if
         next
         sumversion += len(compressed)

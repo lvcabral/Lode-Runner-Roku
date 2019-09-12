@@ -326,7 +326,7 @@ End Function
 Function GetLevelMapImage(spriteMode as integer, versionId as integer, levelId as integer, size = 300 as integer) as string
     LoadGameSprites(spriteMode)
     mapName = GetVersionMap(versionId)
-    tmpFile = "cachefs:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + itostr(size) + ".png"
+    tmpFile = "cachefs:/" + mapName + spriteMode.toStr() + zeroPad(levelId, 3) + size.toStr() + ".png"
     if not m.files.Exists(tmpFile) or versionId = m.const.VERSION_CUSTOM
         'Load level map
         level = CreateLevel(mapName, levelId)
@@ -362,7 +362,7 @@ End Function
 
 Function LevelMapImageExists(spriteMode as integer, versionId as integer, levelId as integer, size = 300 as integer) as string
     mapName = GetVersionMap(versionId)
-    tmpFile = "cachefs:/" + mapName + itostr(spriteMode) + zeroPad(levelId, 3) + itostr(size) + ".png"
+    tmpFile = "cachefs:/" + mapName + spriteMode.toStr() + zeroPad(levelId, 3) + size.toStr() + ".png"
     if not m.files.Exists(tmpFile)
         tmpFile = ""
     end if

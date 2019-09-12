@@ -134,14 +134,14 @@ Function GenerateFrameNames(prefix as string, start as integer, finish as intege
         frame = rnd(length)-1
         for f = 1 to length
             for r = 1 to repeatFrame
-                frameNames.Push(prefix + itostr(frame+start) + suffix)
+                frameNames.Push(prefix + (frame+start).toStr() + suffix)
             next
             frame = (frame + 1) mod length
         next
     else
         for f = start to finish
             for r = 1 to repeatFrame
-                frameNames.Push(prefix + itostr(f) + suffix)
+                frameNames.Push(prefix + f.toStr() + suffix)
             next
         next
     end if
@@ -352,16 +352,11 @@ End Function
 '------- String Functions -------
 
 Function itostr(i as integer) as string
-    'return i.ToStr() 'commented until emulator supports .ToStr()
-    if i >=0
-        return Str(i).Mid(1)
-    else
-        return Str(i)
-    end if
+    return i.ToStr()
 End Function
 
 Function zeroPad(number as integer, length = 2 as integer) as string
-    text = itostr(number)
+    text = number.toStr()
     if text.Len() < length then text = String(length-text.Len(), "0") + text
     return text
 End Function

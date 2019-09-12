@@ -126,7 +126,7 @@ End Sub
 
 Sub ResetGame()
     g = GetGlobalAA()
-    print "Reseting Level "; itostr(g.currentLevel)
+    'print "Reseting Level "; g.currentLevel
     if g.level <> invalid
         DestroyStage()
         if g.guards <> invalid and g.guards.Count() > 0

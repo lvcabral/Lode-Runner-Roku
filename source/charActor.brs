@@ -37,7 +37,7 @@ Sub move_actor(action)
             AddScore(m.const.SCORE_GOLD)
             takeGold = true
             if m.level.gold = 0
-                PlaySound("goldFinish" + itostr((m.level.number - 1) MOD 6 + 1))
+                PlaySound("goldFinish" + ((m.level.number - 1) MOD 6 + 1).toStr())
             end if
         else if m.hasGold = 0
             m.hasGold = Rnd(26) + 12
