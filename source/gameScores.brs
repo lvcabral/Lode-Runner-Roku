@@ -157,9 +157,10 @@ Function NewHighScore(newScores as object, index as integer) as string
             else if key = m.code.BUTTON_DOWN_PRESSED
                 moveCursor = true
             end if
-            if moveCursor 
+            if moveCursor and curTimer > 0
                 m.sounds.navSingle.Trigger(50)
-                curButton = DrawNameRegistration(newScores, index, playerName, curTimer, flash, curButton, key)
+                curButton = CursorUpdate(curButton, key)
+                DrawNameRegistration(newScores, index, playerName, curTimer, flash, curButton, key)
                 key = 0
             end if
         else if event = invalid
@@ -171,7 +172,7 @@ Function NewHighScore(newScores as object, index as integer) as string
                 if curTimer = 0
                     exit while
                 end if
-                curButton = DrawNameRegistration(newScores, index, playerName, curTimer, flash, curButton, key)
+                DrawNameRegistration(newScores, index, playerName, curTimer, flash, curButton, key)
                 if counter mod 10 = 0
                     if curTimer > 0 curTimer-- else curTimer++
                 end if
@@ -183,7 +184,7 @@ Function NewHighScore(newScores as object, index as integer) as string
     return playerName
 End Function
 
-Function DrawNameRegistration(newScores as object, index as integer, playerName as string, curTimer as integer, flash as boolean, curButton as integer, key as integer) as integer
+Sub DrawNameRegistration(newScores as object, index as integer, playerName as string, curTimer as integer, flash as boolean, curButton as integer, key as integer)
     bmp = CreateObject("roBitmap", {width:640, height:480, alphaenable:true})
     width = bmp.GetWidth()
     border = 10
@@ -228,6 +229,20 @@ Function DrawNameRegistration(newScores as object, index as integer, playerName 
     y += lineSpacing * 2
     WriteText(bmp, text, x, y)
 
+    x = CenterText("A B C D E F G H I J", width) - 6 + (curButton - Int(curButton / 10) * 10) * (letterWidth*2)
+    y = m.yOff + Int(curButton / 10) * 30
+    cursor = CreateObject("roBitmap", "pkg:/images/keyboard_cursor.png")
+    bmp.DrawObject(x, y, cursor)
+
+    ' Paint the Screen
+    centerX = Cint((m.mainScreen.GetWidth() - bmp.GetWidth()) / 2)
+    centerY = Cint((m.mainScreen.GetHeight() - bmp.GetHeight()) / 2)
+    m.mainScreen.Clear(m.colors.black)
+    m.mainScreen.DrawObject(centerX, centerY, bmp)
+    m.mainScreen.SwapBuffers()
+End Sub
+
+Function CursorUpdate(curButton, key)
     ' Update Cursor 
     if key = m.code.BUTTON_LEFT_PRESSED
         if curButton = 0
@@ -252,17 +267,6 @@ Function DrawNameRegistration(newScores as object, index as integer, playerName 
             curButton-=29
         end if
     end if
-    x = CenterText("A B C D E F G H I J", width) - 6 + (curButton - Int(curButton / 10) * 10) * (letterWidth*2)
-    y = m.yOff + Int(curButton / 10) * 30
-    cursor = CreateObject("roBitmap", "pkg:/images/keyboard_cursor.png")
-    bmp.DrawObject(x, y, cursor)
-
-    ' Paint the Screen
-    centerX = Cint((m.mainScreen.GetWidth() - bmp.GetWidth()) / 2)
-    centerY = Cint((m.mainScreen.GetHeight() - bmp.GetHeight()) / 2)
-    m.mainScreen.Clear(m.colors.black)
-    m.mainScreen.DrawObject(centerX, centerY, bmp)
-    m.mainScreen.SwapBuffers()
     return curButton
 End Function
 
