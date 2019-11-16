@@ -1,5 +1,14 @@
 ## Lode Runner Changelog
 
+### v0.18 - 11-Nov-2019 - Fixe for SD Mode
+
+- Fix: SD Mode was cutting the screens in small TVs #54
+
+### v0.17 - 02-Sep-2019 - Emulator Release
+
+- Add: Performance improvements of the game play and custom level editor
+- Add: Small changes to support the emulator that allows to run the game on Chrome browser
+
 ### v0.16 18-Jul-2019 - Added new versions and support for 15 custom levels
 
 * Add: Version "Revenge of Lode Runner" (1986) - 17 levels #50
